@@ -1,12 +1,20 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { Info } from 'lucide-vue'
 import { songs } from './data'
+const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', 'VOCALOID', '综合', '南梦宫原创']
+const selectedType = ref('全部')
+const tags = ['魔王里', '双打', '华语']
+const selectedTags = ref<string[]>([])
+const sorts = ['默认', '简单', '一般', '困难', '魔王', '魔王里']
+const selectedSort = ref('默认')
 </script>
 
 <template>
   <img class="fixed w-screen h-screen object-cover -z-1" src="/img/bg.png" alt="">
   <div class="w-full h-50 bg-gradient-to-b from-amber-400 to-transparent flex flex-col items-center">
     <div class="w-screen-xl p-8">
-      <p>Taiko Score</p>
+      <p class="font-bold text-amber-950">Donder 查分器</p>
     </div>
     <div>
       <img class="w-80" src="/img/logo.png" alt="">
@@ -17,16 +25,51 @@ import { songs } from './data'
       <p class="bg-gradient-to-b from-amber-200 to-amber-400 rounded-full px-4 py-2">全部曲目</p>
       <p class="rounded-full px-4 py-2">成绩查询</p>
     </div>
-    <input
-      type="text"
-      placeholder="请输入歌曲名称、作曲家，或者别名咚~"
-      class="w-full p-4 bg-white/25 rounded-xl border-white border-2 ring-2 ring-amber-950 focus:(outline-none bg-white/50)"
-    >
-    <div class="bg-white w-full rounded-xl border-white border-2 ring-2 ring-amber-950 overflow-hidden">
-      <p class="font-bold p-4 bg-gray-200">筛选与排序</p>
-      <div>
-        <p class="font-bold">筛选</p>
+    <div class="bg-white/50 w-full rounded-xl p-4 border-white border-2 ring-2 ring-amber-950 space-y-4">
+      <input
+        type="text"
+        placeholder="请输入歌曲名称、作曲家，或者别名咚~"
+        class="w-full p-4 bg-white rounded-xl border-white border-2 ring-2 ring-amber-950 outline-none"
+      >
+      <div class="flex items-center">
+        <p class="w-15">分类</p>
+        <div class="flex space-x-4">
+          <p
+            v-for="type in types" :key="type"
+            class="text-amber-950"
+            :class="{ 'font-bold text-shadow !text-amber-800': selectedType === type }"
+          >
+            {{ type }}
+          </p>
+        </div>
       </div>
+      <div class="flex items-center">
+        <p class="w-15">标签</p>
+        <div class="flex space-x-4">
+          <p
+            v-for="tag in tags" :key="tag"
+            class="text-amber-950"
+            :class="{ 'font-bold text-shadow !text-amber-800': selectedTags.includes(tag) }"
+          >
+            {{ tag }}
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center">
+        <p class="w-15">排序</p>
+        <div class="flex space-x-4">
+          <p
+            v-for="sort in sorts" :key="sort"
+            class="text-amber-950"
+            :class="{ 'font-bold text-shadow !text-amber-800': selectedSort === sort }"
+          >
+            {{ sort }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="bg-blue-200 rounded-full px-4 py-2 text-sm shadow">
+      <p>查找到 100 首曲目</p>
     </div>
     <div class="w-full">
       <div
@@ -68,6 +111,15 @@ import { songs } from './data'
 </template>
 
 <style>
+@font-face {
+  font-family: ChillRoundF;
+  src: url('/font/ChillRoundF.woff2') format('woff2');
+}
+
+body {
+  font-family: ChillRoundF, sans-serif;
+}
+
 .text-border {
   text-shadow: -1px -1px 1px #451a03, 1px -1px 1px #451a03, -1px 1px 1px #451a03, 1px 1px 1px #451a03;
 }
