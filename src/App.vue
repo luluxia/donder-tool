@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Info } from 'lucide-vue'
+import { Search, Info, ChevronDown, ChevronUp } from 'lucide-vue-next'
 import { songs } from './data'
 const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', 'VOCALOID', '综合', '南梦宫原创']
 const selectedType = ref('全部')
@@ -21,54 +21,63 @@ const selectedSort = ref('默认')
     </div>
   </div>
   <div class="w-screen-xl mx-auto my-8 flex flex-col items-center gap-8 text-dark">
-    <div class="flex rounded-full bg-white/25 border-white border-2 ring-2 ring-amber-950 font-bold">
-      <p class="bg-gradient-to-b from-amber-200 to-amber-400 rounded-full px-4 py-2">全部曲目</p>
+    <div class="flex rounded-full bg-white/25 border-white border-2 ring-2 ring-amber-950">
+      <p class="bg-gradient-to-b from-amber-200 to-amber-400 rounded-full px-4 py-2 text-border text-white">全部曲目</p>
       <p class="rounded-full px-4 py-2">成绩查询</p>
     </div>
     <div class="bg-white/50 w-full rounded-xl p-4 border-white border-2 ring-2 ring-amber-950 space-y-4">
-      <input
-        type="text"
-        placeholder="请输入歌曲名称、作曲家，或者别名咚~"
-        class="w-full p-4 bg-white rounded-xl border-white border-2 ring-2 ring-amber-950 outline-none"
-      >
+      <!-- 搜索 -->
       <div class="flex items-center">
-        <p class="w-15">分类</p>
-        <div class="flex space-x-4">
-          <p
-            v-for="type in types" :key="type"
-            class="text-amber-950"
-            :class="{ 'font-bold text-shadow !text-amber-800': selectedType === type }"
-          >
-            {{ type }}
-          </p>
-        </div>
+        <Search class="absolute ml-4" />
+        <input
+          type="text"
+          placeholder="请输入歌曲名称、作曲家，或者别名咚~"
+          class="w-full pl-12 p-4 bg-white rounded-xl border-white border-2 ring-2 ring-amber-950 outline-none"
+        >
       </div>
-      <div class="flex items-center">
-        <p class="w-15">标签</p>
-        <div class="flex space-x-4">
-          <p
-            v-for="tag in tags" :key="tag"
-            class="text-amber-950"
-            :class="{ 'font-bold text-shadow !text-amber-800': selectedTags.includes(tag) }"
-          >
-            {{ tag }}
-          </p>
+      <!-- 筛选与排序 -->
+      <div class="space-y-2">
+        <div class="flex items-center">
+          <p class="w-15">分类</p>
+          <div class="flex space-x-2">
+            <p
+              v-for="type in types" :key="type"
+              class="text-amber-950 px-2 py-0.5 rounded cursor-pointer hover:bg-amber-400/50"
+              :class="{ 'text-border !bg-amber-400 text-white': selectedType === type }"
+            >
+              {{ type }}
+            </p>
+          </div>
         </div>
-      </div>
-      <div class="flex items-center">
-        <p class="w-15">排序</p>
-        <div class="flex space-x-4">
-          <p
-            v-for="sort in sorts" :key="sort"
-            class="text-amber-950"
-            :class="{ 'font-bold text-shadow !text-amber-800': selectedSort === sort }"
-          >
-            {{ sort }}
-          </p>
+        <div class="flex items-center">
+          <p class="w-15">标签</p>
+          <div class="flex space-x-2">
+            <p
+              v-for="tag in tags" :key="tag"
+              class="text-amber-950 px-2 py-0.5 rounded cursor-pointer hover:bg-amber-400/50"
+              :class="{ 'text-border !bg-amber-400 text-white': selectedTags.includes(tag) }"
+            >
+              {{ tag }}
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center">
+          <p class="w-15">排序</p>
+          <div class="flex space-x-2">
+            <div
+              v-for="(sort, index) in sorts" :key="sort"
+              class="text-amber-950 px-2 py-0.5 rounded cursor-pointer flex items-center hover:bg-amber-400/50"
+              :class="{ 'text-border !bg-amber-400 text-white': selectedSort === sort }"
+            >
+              <p>{{ sort }}</p>
+              <ChevronDown v-if="index" class="w-5 !text-amber-950 opacity-50" />
+          </div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="bg-blue-200 rounded-full px-4 py-2 text-sm shadow">
+    <div class="bg-blue-200 rounded-full px-4 py-2 text-sm shadow flex items-center space-x-2">
+      <Info class="w-5" />
       <p>查找到 100 首曲目</p>
     </div>
     <div class="w-full">
@@ -78,11 +87,11 @@ const selectedSort = ref('默认')
         class="p-4 rounded-xl flex justify-between items-center hover:(bg-black/5)"
       >
         <div class="flex items-center space-x-2">
-          <p class="text-sm px-2 py-1 rounded-full bg-blue-500 text-white text-shadow font-bold border-2 border-white">
+          <p class="text-sm px-2 py-1 rounded-full bg-blue-500 text-white text-shadow border-2 border-white">
             {{ song.type }}
           </p>
           <div>
-            <p class="font-bold">{{ song.song_name }}</p>
+            <p>{{ song.song_name }}</p>
             <p v-if="song.subtitle" class="text-sm text-gray-500">{{ song.subtitle }}</p>
           </div>
         </div>
