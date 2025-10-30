@@ -8,6 +8,7 @@ const tags = ['魔王里', '双打', '华语']
 const selectedTags = ref<string[]>([])
 const sorts = ['默认', '简单', '一般', '困难', '魔王', '魔王里']
 const selectedSort = ref('默认')
+const sortDirection = ref<'asc' | 'desc'>('desc')
 const searchQuery = ref('')
 
 const toggleTag = (tag: string) => {
@@ -16,6 +17,20 @@ const toggleTag = (tag: string) => {
     selectedTags.value.splice(index, 1)
   } else {
     selectedTags.value.push(tag)
+  }
+}
+
+const selectSort = (sort: string) => {
+  if (sort === '默认') {
+    selectedSort.value = '默认'
+    return
+  }
+  if (selectedSort.value === sort) {
+    // 切换顺序
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    selectedSort.value = sort
+    sortDirection.value = 'desc' // 默认降序
   }
 }
 
@@ -38,35 +53,34 @@ const filteredSongs = computed(() => {
   }
 
   // 标签筛选
-  if (selectedTags.value.length > 0) {
-    filtered = filtered.filter(song => {
-      const hasMaouRi = selectedTags.value.includes('魔王里') && song.level_5 && song.level_5 !== '-'
-      const hasDouble = selectedTags.value.includes('双打') && song.song_name.includes('【双打】')
-      const hasChinese = selectedTags.value.includes('华语') && (
-        song.song_name.match(/[\u4e00-\u9fa5]/) ||
-        (song.subtitle && typeof song.subtitle === 'string' && song.subtitle.match(/[\u4e00-\u9fa5]/))
-      )
-      return hasMaouRi || hasDouble || hasChinese
-    })
-  }
+  // if (selectedTags.value.length > 0) {
+  //   filtered = filtered.filter(song => {
+  //     const hasMaouRi = selectedTags.value.includes('魔王里') && song.level_5 && song.level_5 !== '-'
+  //     const hasDouble = selectedTags.value.includes('双打') && song.song_name.includes('【双打】')
+  //     const hasChinese = selectedTags.value.includes('华语') && (
+  //       song.song_name.match(/[\u4e00-\u9fa5]/) ||
+  //       (song.subtitle && typeof song.subtitle === 'string' && song.subtitle.match(/[\u4e00-\u9fa5]/))
+  //     )
+  //     return hasMaouRi || hasDouble || hasChinese
+  //   })
+  // }
 
   // 排序
   const sortKey = selectedSort.value
-  if (sortKey === '默认') {
-    filtered = [...filtered].sort((a, b) => a.sort - b.sort)
-  } else if (sortKey === '简单') {
-    filtered = [...filtered].sort((a, b) => parseInt(String(a.level_1)) - parseInt(String(b.level_1)))
+  const multiplier = sortDirection.value === 'asc' ? 1 : -1
+  if (sortKey === '简单') {
+    filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_1)) - parseInt(String(b.level_1))))
   } else if (sortKey === '一般') {
-    filtered = [...filtered].sort((a, b) => parseInt(String(a.level_2)) - parseInt(String(b.level_2)))
+    filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_2)) - parseInt(String(b.level_2))))
   } else if (sortKey === '困难') {
-    filtered = [...filtered].sort((a, b) => parseInt(String(a.level_3)) - parseInt(String(b.level_3)))
+    filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_3)) - parseInt(String(b.level_3))))
   } else if (sortKey === '魔王') {
-    filtered = [...filtered].sort((a, b) => parseInt(String(a.level_4)) - parseInt(String(b.level_4)))
+    filtered = [...filtered].sort((a, b) => multiplier * (parseInt(String(a.level_4)) - parseInt(String(b.level_4))))
   } else if (sortKey === '魔王里') {
     filtered = [...filtered].sort((a, b) => {
       const aLevel = a.level_5 && a.level_5 !== '-' ? parseInt(String(a.level_5)) : parseInt(String(a.level_4))
       const bLevel = b.level_5 && b.level_5 !== '-' ? parseInt(String(b.level_5)) : parseInt(String(b.level_4))
-      return aLevel - bLevel
+      return multiplier * (aLevel - bLevel)
     })
   }
 
@@ -119,7 +133,7 @@ const filteredSongs = computed(() => {
             <p
               v-for="type in types" :key="type"
               @click="selectedType = type"
-              class="text-amber-950 px-2 py-0.5 rounded cursor-pointer hover:bg-amber-400/50"
+              class="text-amber-950 px-2 py-0.5 rounded cursor-pointer transition-colors hover:bg-amber-400/50"
               :class="{ 'text-border !bg-amber-400 text-white': selectedType === type }"
             >
               {{ type }}
@@ -132,7 +146,7 @@ const filteredSongs = computed(() => {
             <p
               v-for="tag in tags" :key="tag"
               @click="toggleTag(tag)"
-              class="text-amber-950 px-2 py-0.5 rounded cursor-pointer hover:bg-amber-400/50"
+              class="text-amber-950 px-2 py-0.5 rounded cursor-pointer transition-colors hover:bg-amber-400/50"
               :class="{ 'text-border !bg-amber-400 text-white': selectedTags.includes(tag) }"
             >
               {{ tag }}
@@ -144,13 +158,14 @@ const filteredSongs = computed(() => {
           <div class="flex space-x-2">
             <div
               v-for="(sort, index) in sorts" :key="sort"
-              @click="selectedSort = sort"
-              class="text-amber-950 px-2 py-0.5 rounded cursor-pointer flex items-center hover:bg-amber-400/50"
+              @click="selectSort(sort)"
+              class="text-amber-950 px-2 py-0.5 rounded cursor-pointer transition-colors flex items-center hover:bg-amber-400/50"
               :class="{ 'text-border !bg-amber-400 text-white': selectedSort === sort }"
             >
               <p>{{ sort }}</p>
-              <ChevronDown v-if="index" class="w-5 !text-amber-950 opacity-50" />
-          </div>
+              <ChevronDown v-if="index > 0 && selectedSort === sort && sortDirection === 'desc'" class="w-5 !text-amber-950 opacity-50" />
+              <ChevronUp v-else-if="index > 0 && selectedSort === sort && sortDirection === 'asc'" class="w-5 !text-amber-950 opacity-50" />
+            </div>
           </div>
         </div>
       </div>
@@ -162,15 +177,27 @@ const filteredSongs = computed(() => {
     <div class="w-full">
       <div
         v-for="song in filteredSongs"
-        :key="song.id"
-        class="p-4 rounded-xl flex justify-between items-center [content-visibility:auto] hover:(bg-black/5)"
+        :key="song.sort"
+        class="p-4 rounded-xl flex justify-between items-center [content-visibility:auto] transition-colors hover:(bg-black/5)"
       >
         <div class="flex items-center space-x-2">
-          <p class="text-sm px-2 py-1 rounded-full bg-blue-500 text-white text-shadow border-2 border-white">
+          <p
+            class="text-sm px-2 py-1 rounded-full text-white text-shadow border-2 border-white"
+            :class="{
+              'bg-blue-500' : song.type === '流行音乐',
+              'bg-pink-500' : song.type === '动漫音乐',
+              'bg-purple-500' : song.type === '游戏音乐',
+              'bg-amber-500' : song.type === '古典音乐',
+              'bg-yellow-500' : song.type === '儿童音乐',
+              'bg-gray-500' : song.type === '博歌乐音乐',
+              'bg-green-500' : song.type === '综合音乐',
+              'bg-red-500' : song.type === '南梦宫原创音乐',
+            }"
+          >
             {{ song.type }}
           </p>
           <div>
-            <p>{{ song.song_name }}</p>
+            <p class="text-xl">{{ song.song_name }}</p>
             <p v-if="song.subtitle" class="text-sm text-gray-500">{{ song.subtitle }}</p>
           </div>
         </div>
