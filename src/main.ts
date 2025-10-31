@@ -1,8 +1,8 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
-import Search from './components/Search.vue'
-import Score from './components/Score.vue'
+import Search from './pages/Search.vue'
+import Score from './pages/Score.vue'
 import 'virtual:uno.css'
 import '@unocss/reset/tailwind.css'
 

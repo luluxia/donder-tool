@@ -192,7 +192,7 @@ const filteredSongs = computed(() => {
           >
             <div class="absolute w-full h-full bg-gradient-to-b from-white/50 to-transparent"></div>
             <div class="relative w-full h-full flex items-center justify-center space-x-1">
-              <img class="w-6" :src="`/img/level_${i}.png`" alt="">
+              <img class="w-6" :src="`/img/level/level_${i}.png`" alt="">
               <p class="text-white font-bold text-xl text-border">{{ (song as any)[`level_${i}`] || '-' }}</p>
             </div>
           </div>
