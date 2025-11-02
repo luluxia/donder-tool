@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, inject, type Ref } from 'vue'
 import { Search, Info, ChevronDown, ChevronUp } from 'lucide-vue-next'
-import { songs } from '../data'
+
+const songs = inject('cnData') as any
 
 const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
 const selectedType = ref('全部')
-const tags = ['魔王里', '双打', '华语']
+const tags = ['魔王里', '双打', '华语', '谱面分歧']
 const selectedTags = ref<string[]>([])
 const sorts = ['默认', '简单', '一般', '困难', '魔王', '魔王里']
 const selectedSort = ref('默认')
@@ -36,12 +37,12 @@ const selectSort = (sort: string) => {
 }
 
 const filteredSongs = computed(() => {
-  let filtered = songs
+  let filtered = songs.value || []
 
   // 搜索
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(song =>
+    filtered = filtered.filter((song: any) =>
       song.song_name.toLowerCase().includes(query) ||
       (song.subtitle && typeof song.subtitle === 'string' && song.subtitle.toLowerCase().includes(query)) ||
       song.song_name_jp.toLowerCase().includes(query)
@@ -50,7 +51,7 @@ const filteredSongs = computed(() => {
 
   // 类型筛选
   if (selectedType.value !== '全部') {
-    filtered = filtered.filter(song => song.type === `${selectedType.value}音乐`)
+    filtered = filtered.filter((song: any) => song.type === `${selectedType.value}音乐`)
   }
 
   // 标签筛选
@@ -87,13 +88,25 @@ const filteredSongs = computed(() => {
 
   return filtered
 })
+
+const detailVisible = inject<Ref<boolean>>('detailVisible')
+const detailSongId = inject<Ref<number | undefined>>('detailSongId')
+const detailLevel = inject<Ref<number | undefined>>('detailLevel')
+
+const handleOpenDetail = (songId: number, level: number) => {
+  if (detailVisible && detailSongId && detailLevel) {
+    detailSongId.value = songId
+    detailLevel.value = level
+    detailVisible.value = true
+  }
+}
 </script>
 
 <template>
   <div class="w-screen-xl mx-auto my-8 flex flex-col items-center gap-8 text-dark">
     <div class="bg-white/50 w-full rounded-xl p-4 border-white border-2 ring-2 ring-amber-950 space-y-4">
       <!-- 搜索 -->
-      <div class="flex items-center">
+      <div class="relative flex items-center">
         <Search class="absolute ml-4" />
         <input
           v-model="searchQuery"
@@ -154,6 +167,7 @@ const filteredSongs = computed(() => {
     <div class="w-full">
       <div
         v-for="song in filteredSongs"
+        @click="handleOpenDetail(song.id, song.level_5 && song.level_5 !== '-' ? 5 : 4)"
         :key="song.sort"
         class="p-4 rounded-xl flex justify-between items-center [content-visibility:auto] transition-colors hover:(bg-black/5)"
       >
@@ -181,13 +195,15 @@ const filteredSongs = computed(() => {
         <div class="flex space-x-2">
           <div
             v-for="i in 5"
-            class="relative w-15 h-10 rounded-lg border-2 border-white"
+            @click.stop="handleOpenDetail(song.id, i)"
+            class="relative w-15 h-10 rounded-lg border-2 border-white overflow-hidden"
             :class="{
               'bg-red-300': i === 1,
               'bg-lime-300': i === 2,
               'bg-blue-300': i === 3,
               'bg-pink-300': i === 4,
               'bg-purple-300': i === 5,
+              'cursor-pointer transition-all hover:(ring-2 ring-amber-950)': (song[`level_${i}`] && song[`level_${i}`] !== '-')
             }"
           >
             <div class="absolute w-full h-full bg-gradient-to-b from-white/50 to-transparent"></div>

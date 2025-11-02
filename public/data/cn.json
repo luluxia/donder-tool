@@ -1,4 +1,4 @@
-export const songs = [
+[
     {
         "sort": 1,
         "id": 1218,

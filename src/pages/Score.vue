@@ -191,7 +191,7 @@ const filteredScores = computed(() => {
     </div>
     <div class="bg-white/50 w-full rounded-xl p-4 border-white border-2 ring-2 ring-amber-950 space-y-4">
       <!-- 搜索 -->
-      <div class="flex items-center">
+      <div class="relative flex items-center">
         <Search class="absolute ml-4" />
         <input
           v-model="searchQuery"
@@ -310,7 +310,7 @@ const filteredScores = computed(() => {
           <img class="w-10" :src="`/img/score_badge/score_${score.best_score_rank}.png`" alt="">
           <!-- 分数 -->
           <div>
-            <p class="text-white font-bold text-2xl text-border w-22 text-center">{{ score.high_score }}</p>
+            <p class="text-white font-bold text-2xl text-border w-24 text-center">{{ score.high_score }}</p>
           </div>
           <!-- 难度 -->
           <div
