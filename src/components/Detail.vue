@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, inject, watchEffect } from 'vue'
+import { onMounted, ref, inject, watchEffect, version } from 'vue'
 
 const emit = defineEmits(['update:visible', 'update:select-level'])
 
@@ -48,6 +48,8 @@ watchEffect(() => {
         return `${wiki?.bpm.min || ''} - ${wiki?.bpm.max || ''}`
       }
     })(),
+    artists: wiki?.artists.join(' / ') || '',
+    version: wiki?.version.join(' / ') || '',
     levels: Object.values(wiki?.courses || {}).filter(Boolean).map((course: any, index) => ({
       index: index + 1,
       level: course?.level,
@@ -63,7 +65,7 @@ const handleLevelChange = (newLevel: number) => {
 
 <template>
   <dialog ref="dialogRef" @click="closeDialog" class="fixed w-screen h-screen top-0 bg-black/50 flex">
-    <div @click.stop class="dialog-content bg-white rounded-xl m-auto shadow-xl w-150 h-[calc(100vh-4rem)] flex overflow-hidden">
+    <div @click.stop class="dialog-content bg-white rounded-xl m-auto shadow-xl w-200 h-[calc(100vh-4rem)] flex overflow-hidden">
       <div v-if="data" class="space-y-4 flex-1 overflow-y-auto p-8">
         <!-- 歌曲ID -->
         <p class="text-gray text-sm">#{{ props.songId }}</p>
@@ -86,6 +88,14 @@ const handleLevelChange = (newLevel: number) => {
           <div class="flex items-center space-x-2 text-sm">
             <p class="text-gray-500">日文标题</p>
             <p class="flex-1 min-w-0">{{ data.titleJp }}</p>
+          </div>
+          <div class="flex items-center space-x-2 text-sm">
+            <p class="text-gray-500">作曲家</p>
+            <p class="flex-1 min-w-0">{{ data.artists }}</p>
+          </div>
+          <div class="flex items-center space-x-2 text-sm">
+            <p class="text-gray-500">收录版本</p>
+            <p class="flex-1 min-w-0">{{ data.version }}</p>
           </div>
           <div class="flex items-center space-x-2 text-sm">
             <p class="text-gray-500">BPM</p>
@@ -125,6 +135,22 @@ const handleLevelChange = (newLevel: number) => {
             </div>
           </div>
           <div class="w-full min-h-50 border-2 border-amber-950 rounded-lg rounded-tl-none overflow-hidden">
+            <div class="p-2 grid grid-cols-3">
+              <div class="space-y-2">
+                <div class="bg-red-400 text-white rounded-lg overflow-hidden text-center">
+                  <p class="p-1 bg-red-500 text-sm">历史最高得分</p>
+                  <p class="text-xl p-2">900000</p>
+                </div>
+                <div class="grid grid-cols-2">
+                  <div class="flex">
+                    <img class="m-auto w-15" src="/img/score_badge/score_7.png" alt=""></img>
+                  </div>
+                  <div class="flex">
+                    <img class="m-auto w-15" src="/img/crown/crown_gold.png" alt=""></img>
+                  </div>
+                </div>
+              </div>
+            </div>
             <img v-for="image in data.levels[selectLevel - 1]?.images" :src="image" :key="image" alt="">
           </div>
         </div>

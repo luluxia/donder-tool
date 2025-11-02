@@ -3,16 +3,20 @@ import { onMounted, provide, ref } from 'vue'
 import { HelpCircle, LogIn, Drum } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
 import Detail from './components/Detail.vue'
+import BackToTop from './components/BackToTop.vue'
 
 const route = useRoute()
 
-const detailVisible = ref(false)
-const detailSongId = ref()
-const detailLevel = ref()
+const scrollContainer = ref()
+
+const detailVisible = ref(true)
+const detailSongId = ref(1218)
+const detailLevel = ref(1)
 
 provide('detailVisible', detailVisible)
 provide('detailSongId', detailSongId)
 provide('detailLevel', detailLevel)
+provide('scrollContainer', scrollContainer)
 
 const cnData = ref()
 const wikiData = ref()
@@ -36,7 +40,7 @@ onMounted(async () => {
     <div class="absolute w-full h-50 bg-gradient-to-b from-amber-400 to-transparent"></div>
   </div>
   <!-- 内容 -->
-  <div class="w-screen h-screen overflow-auto [scrollbar-gutter:stable_both-edges]">
+  <div ref="scrollContainer" class="w-screen h-screen overflow-auto [scrollbar-gutter:stable_both-edges]">
     <div class="w-full h-50 flex flex-col items-center mb-12">
       <div class="w-screen-xl p-8 flex justify-between items-center">
         <div class="text-amber-800 flex space-x-2">
@@ -88,6 +92,7 @@ onMounted(async () => {
       :song-id="detailSongId"
     />
   </transition>
+  <BackToTop />
 </template>
 
 <style>
