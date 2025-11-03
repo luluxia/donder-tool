@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, inject, watchEffect, version } from 'vue'
+import { onMounted, ref, inject, watchEffect } from 'vue'
 
 const emit = defineEmits(['update:visible', 'update:select-level'])
 
@@ -22,10 +22,13 @@ const data = ref()
 
 const cnData = inject('cnData') as any
 const wikiData = inject('wikiData') as any
+const scores = inject('scores') as any
 
 watchEffect(() => {
   const cn = cnData.value?.find((item: any) => item.id === props.songId)
   const wiki = wikiData.value?.find((item: any) => Number(item.songNo) === props.songId)
+
+  const score = scores.value?.find((s: any) => s.song_no === props.songId && s.level === props.selectLevel)
 
   data.value = {
     type: cn?.type || '',
@@ -55,6 +58,7 @@ watchEffect(() => {
       level: course?.level,
       images: course?.images,
     })),
+    scoreData: score || null,
   }
 })
 
@@ -135,19 +139,65 @@ const handleLevelChange = (newLevel: number) => {
             </div>
           </div>
           <div class="w-full min-h-50 border-2 border-amber-950 rounded-lg rounded-tl-none overflow-hidden">
-            <div class="p-2 grid grid-cols-3">
-              <div class="space-y-2">
-                <div class="bg-red-400 text-white rounded-lg overflow-hidden text-center">
+            <div v-if="data.scoreData" class="p-2 grid grid-cols-3 gap-2">
+              <div class="space-y-1 flex flex-col">
+                <div class="bg-red-400 text-white rounded-lg overflow-hidden text-center flex-1 flex flex-col">
                   <p class="p-1 bg-red-500 text-sm">历史最高得分</p>
-                  <p class="text-xl p-2">900000</p>
+                  <div class="flex-1 flex flex-col justify-center items-center">
+                    <p class="text-border m-auto text-white font-bold text-3xl tracking-widest">{{ data.scoreData?.high_score }}</p>
+                  </div>
                 </div>
+                <p class="text-xs opacity-50 text-center">{{ data.scoreData?.highscore_datetime }}</p>
                 <div class="grid grid-cols-2">
                   <div class="flex">
-                    <img class="m-auto w-15" src="/img/score_badge/score_7.png" alt=""></img>
+                    <img class="m-auto w-15" :src="`/img/score_badge/score_${data.scoreData?.best_score_rank}.png`" alt=""></img>
                   </div>
                   <div class="flex">
-                    <img class="m-auto w-15" src="/img/crown/crown_gold.png" alt=""></img>
+                    <img class="m-auto w-15" :src="`/img/crown/crown_${data.scoreData?.full_combo_cnt > 0 ? 'gold' : 'silver'}.png`" alt=""></img>
                   </div>
+                </div>
+              </div>
+              <div class="space-y-1 text-border text-white">
+                <div class="flex justify-between items-center bg-gradient-to-r from-orange-400 to-gray-300 px-2 py-0.5 rounded-lg">
+                  <p class="text-border text-white">良</p>
+                  <p>{{ data.scoreData?.good_cnt }}</p>
+                </div>
+                <div class="flex justify-between items-center bg-gradient-to-r from-gray-400 to-gray-300 px-2 py-0.5 rounded-lg">
+                  <p class="text-border text-white">可</p>
+                  <p>{{ data.scoreData?.ok_cnt }}</p>
+                </div>
+                <div class="flex justify-between items-center bg-gradient-to-r from-blue-400 to-gray-300 px-2 py-0.5 rounded-lg">
+                  <p class="text-border text-white">不可</p>
+                  <p>{{ data.scoreData?.ng_cnt }}</p>
+                </div>
+                <div class="flex justify-between items-center bg-gradient-to-r from-amber-400 to-gray-300 px-2 py-0.5 rounded-lg">
+                  <p class="text-border text-white">连打数</p>
+                  <p>{{ data.scoreData?.pound_cnt }}</p>
+                </div>
+                <div class="flex justify-between items-center bg-gradient-to-r from-red-400 to-gray-300 px-2 py-0.5 rounded-lg">
+                  <p class="text-border text-white">最大连击数</p>
+                  <p>{{ data.scoreData?.combo_cnt }}</p>
+                </div>
+              </div>
+              <div class="space-y-1 text-border text-white">
+                <div class="flex justify-center items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                  <p>游玩统计</p>
+                </div>
+                <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                  <p>游玩次数</p>
+                  <p>{{ data.scoreData?.stage_cnt }}</p>
+                </div>
+                <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                  <p>通关次数</p>
+                  <p>{{ data.scoreData?.clear_cnt }}</p>
+                </div>
+                <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                  <p>全连次数</p>
+                  <p>{{ data.scoreData?.full_combo_cnt }}</p>
+                </div>
+                <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                  <p>全良连段次数</p>
+                  <p>{{ data.scoreData?.dondaful_combo_cnt }}</p>
                 </div>
               </div>
             </div>

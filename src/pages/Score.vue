@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, inject, ref, type Ref } from 'vue'
 import { Search, Info, ChevronDown, ChevronUp } from 'lucide-vue-next'
 
 const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
@@ -30,15 +30,19 @@ const selectSort = (sort: string) => {
   }
 }
 
-const scores = ref([])
+const scores = inject<Ref<any[]>>('scores') || ref([])
 
-onMounted(() => {
-  fetch('/songscore.json')
-    .then(res => res.json())
-    .then(data => {
-      scores.value = data.scoreInfo
-    })
-})
+const detailVisible = inject<Ref<boolean>>('detailVisible')
+const detailSongId = inject<Ref<number | undefined>>('detailSongId')
+const detailLevel = inject<Ref<number | undefined>>('detailLevel')
+
+const handleOpenDetail = (songId: number, level: number) => {
+  if (detailVisible && detailSongId && detailLevel) {
+    detailSongId.value = songId
+    detailLevel.value = level
+    detailVisible.value = true
+  }
+}
 
 const filteredScores = computed(() => {
   let filtered = scores.value
@@ -165,6 +169,7 @@ const filteredScores = computed(() => {
     }
 
     return {
+      songId: item.song_no,
       type: item.song_detail?.type || '',
       song_name: item.song_detail?.song_name || '未知曲目',
       subtitle: item.song_detail?.subtitle || '',
@@ -279,7 +284,8 @@ const filteredScores = computed(() => {
       <div
         v-for="(score, index) in filteredScores"
         :key="index"
-        class="p-4 rounded-xl flex justify-between items-center [content-visibility:auto] transition-colors hover:(bg-black/5)"
+        @click="handleOpenDetail(score.songId, score.level)"
+        class="p-4 rounded-xl flex justify-between items-center [content-visibility:auto] transition-colors hover:(bg-black/5) cursor-pointer"
       >
         <div class="flex items-center space-x-2">
           <p

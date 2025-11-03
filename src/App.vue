@@ -21,8 +21,11 @@ provide('scrollContainer', scrollContainer)
 const cnData = ref()
 const wikiData = ref()
 
+const scores = ref([])
+
 provide('cnData', cnData)
 provide('wikiData', wikiData)
+provide('scores', scores)
 
 onMounted(async () => {
   const cnResponse = await fetch('/data/cn.json')
@@ -30,6 +33,10 @@ onMounted(async () => {
 
   const wikiResponse = await fetch('/data/wiki.json')
   wikiData.value = await wikiResponse.json()
+
+  const scoreResponse = await fetch('/songscore.json')
+  const scoreData = await scoreResponse.json()
+  scores.value = scoreData.scoreInfo
 })
 </script>
 
