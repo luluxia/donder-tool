@@ -53,7 +53,7 @@ onMounted(async () => {
   <!-- 内容 -->
   <div ref="scrollContainer" class="w-screen h-screen overflow-auto [scrollbar-gutter:stable_both-edges]">
     <div class="w-full h-50 flex flex-col items-center mb-12">
-      <div class="w-screen-xl p-8 flex justify-between items-center">
+      <div class="w-full max-w-screen-xl p-4 flex justify-between items-center">
         <div class="text-amber-800 flex space-x-2">
           <Drum class="w-6" />
           <p>Donder 查分器</p>
@@ -62,16 +62,13 @@ onMounted(async () => {
           <div class="text-amber-800 p-2 rounded-full w-10 h-10 flex hover:bg-black/5">
             <HelpCircle class="m-auto" />
           </div>
-          <div class="text-amber-800 p-2 rounded-full w-10 h-10 flex hover:bg-black/5">
-            <LogIn class="m-auto" />
-          </div>
         </div>
       </div>
       <div>
         <img class="w-80" src="/img/logo.png" alt="" />
       </div>
     </div>
-    <div class="w-screen-xl mx-auto my-8 flex flex-col items-center gap-8 text-dark">
+    <div class="w-full max-w-screen-xl mx-auto my-8 flex flex-col items-center gap-8 text-dark">
       <div class="flex rounded-full bg-white/25 border-white border-2 ring-2 ring-amber-950">
         <router-link
           to="/search"

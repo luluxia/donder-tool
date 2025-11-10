@@ -75,7 +75,19 @@ const handleLevelChange = (newLevel: number) => {
         <p class="text-gray text-sm">#{{ props.songId }}</p>
         <!-- 标题 -->
         <div class="flex items-center space-x-2">
-          <p class="text-sm px-2 py-1 rounded-full text-white text-shadow border-2 border-white bg-blue-500">
+          <p
+            class="text-sm px-2 py-1 rounded-full text-white text-shadow border-2 border-white"
+            :class="{
+              'bg-blue-500' : data.type === '流行音乐',
+              'bg-pink-500' : data.type === '动漫音乐',
+              'bg-purple-500' : data.type === '游戏音乐',
+              'bg-amber-500' : data.type === '古典音乐',
+              'bg-yellow-500' : data.type === '儿童音乐',
+              'bg-gray-500' : data.type === '博歌乐音乐',
+              'bg-green-500' : data.type === '综合音乐',
+              'bg-red-500' : data.type === '南梦宫原创音乐',
+            }"
+          >
             {{ data.type }}
           </p>
           <div>

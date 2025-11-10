@@ -63,7 +63,7 @@ const filteredScores = computed(() => {
 
   // 类型筛选
   if (selectedType.value !== '全部') {
-    filtered = filtered.filter((score: any) => score.type === `${selectedType.value}音乐`)
+    filtered = filtered.filter((score: any) => score.song_detail?.type === `${selectedType.value}音乐`)
   }
 
   // 难度筛选
@@ -198,6 +198,7 @@ const getScore = async (id: number) => {
   const data = res.data.score.data
   const scores = typeof data === 'string' ? JSON.parse(data) : data || []
   const updateTime = new Date(res.data.score.updated_at).toLocaleString().replace(/\//g, '.')
+  console.log('Fetched scores:', scores)
   return { scores, updateTime }
 }
 

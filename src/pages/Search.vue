@@ -103,7 +103,7 @@ const handleOpenDetail = (songId: number, level: number) => {
 </script>
 
 <template>
-  <div class="w-screen-xl mx-auto my-8 flex flex-col items-center gap-8 text-dark">
+  <div class="w-full max-w-screen-xl mx-auto my-8 px-4 flex flex-col items-center gap-8 text-dark">
     <div class="bg-white/50 w-full rounded-xl p-4 border-white border-2 ring-2 ring-amber-950 space-y-4">
       <!-- 搜索 -->
       <div class="relative flex items-center">
@@ -119,7 +119,7 @@ const handleOpenDetail = (songId: number, level: number) => {
       <div class="space-y-2">
         <div class="flex items-center">
           <p class="w-15">分类</p>
-          <div class="flex space-x-2">
+          <div class="flex flex-1 min-w-0 flex-wrap gap-x-2 gap-y-1">
             <p
               v-for="type in types" :key="type"
               @click="selectedType = type"
@@ -132,7 +132,7 @@ const handleOpenDetail = (songId: number, level: number) => {
         </div>
         <div class="flex items-center">
           <p class="w-15">标签</p>
-          <div class="flex space-x-2">
+          <div class="flex flex-1 min-w-0 flex-wrap gap-x-2 gap-y-1">
             <p
               v-for="tag in tags" :key="tag"
               @click="toggleTag(tag)"
@@ -145,7 +145,7 @@ const handleOpenDetail = (songId: number, level: number) => {
         </div>
         <div class="flex items-center">
           <p class="w-15">排序</p>
-          <div class="flex space-x-2">
+          <div class="flex flex-1 min-w-0 flex-wrap gap-x-2 gap-y-1">
             <div
               v-for="(sort, index) in sorts" :key="sort"
               @click="selectSort(sort)"
@@ -169,7 +169,7 @@ const handleOpenDetail = (songId: number, level: number) => {
         v-for="song in filteredSongs"
         @click="handleOpenDetail(song.id, song.level_5 && song.level_5 !== '-' ? 5 : 4)"
         :key="song.sort"
-        class="p-4 rounded-xl flex justify-between items-center [content-visibility:auto] transition-colors hover:(bg-black/5)"
+        class="p-4 rounded-xl flex flex-col gap-1 justify-between [content-visibility:auto] transition-colors hover:(bg-black/5) md:(flex-row items-center)"
       >
         <div class="flex items-center space-x-2">
           <p
@@ -185,9 +185,9 @@ const handleOpenDetail = (songId: number, level: number) => {
               'bg-red-500' : song.type === '南梦宫原创音乐',
             }"
           >
-            {{ song.type }}
+            {{ song.type.replace('音乐', '') }}
           </p>
-          <div>
+          <div class="flex-1 min-w-0">
             <p class="text-xl">{{ song.song_name }}</p>
             <p v-if="song.subtitle" class="text-sm text-gray-500">{{ song.subtitle }}</p>
           </div>
