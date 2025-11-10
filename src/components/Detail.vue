@@ -147,7 +147,7 @@ const handleLevelChange = (newLevel: number) => {
                     <p class="text-border m-auto text-white font-bold text-3xl tracking-widest">{{ data.scoreData?.high_score }}</p>
                   </div>
                 </div>
-                <p class="text-xs opacity-50 text-center">{{ data.scoreData?.highscore_datetime }}</p>
+                <p class="text-xs opacity-50 text-center">{{ data.scoreData?.highscore_datetime.replace(/\//g, '.') }}</p>
                 <div class="grid grid-cols-2">
                   <div class="flex">
                     <img class="m-auto w-15" :src="`/img/score_badge/score_${data.scoreData?.best_score_rank}.png`" alt=""></img>

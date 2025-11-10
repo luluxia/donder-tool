@@ -5,7 +5,13 @@ import UnoCSS from 'unocss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag === 'cap-widget'
+        }
+      }
+    }),
     UnoCSS(),
   ],
 })

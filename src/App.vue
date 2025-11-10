@@ -9,9 +9,9 @@ const route = useRoute()
 
 const scrollContainer = ref()
 
-const detailVisible = ref(true)
-const detailSongId = ref(1218)
-const detailLevel = ref(1)
+const detailVisible = ref(false)
+const detailSongId = ref()
+const detailLevel = ref()
 
 provide('detailVisible', detailVisible)
 provide('detailSongId', detailSongId)
@@ -21,6 +21,8 @@ provide('scrollContainer', scrollContainer)
 const cnData = ref()
 const wikiData = ref()
 
+const userId = ref()
+provide('userId', userId)
 const scores = ref([])
 
 provide('cnData', cnData)
@@ -34,9 +36,11 @@ onMounted(async () => {
   const wikiResponse = await fetch('/data/wiki.json')
   wikiData.value = await wikiResponse.json()
 
-  const scoreResponse = await fetch('/songscore.json')
-  const scoreData = await scoreResponse.json()
-  scores.value = scoreData.scoreInfo
+  // const scoreResponse = await fetch('/songscore.json')
+  // const scoreData = await scoreResponse.json()
+  // scores.value = scoreData.scoreInfo
+
+  localStorage.getItem('userId') && (userId.value = localStorage.getItem('userId') || '')
 })
 </script>
 
