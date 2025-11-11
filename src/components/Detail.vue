@@ -21,12 +21,12 @@ const props = defineProps<{
 const data = ref()
 
 const cnData = inject('cnData') as any
-const wikiData = inject('wikiData') as any
+// const wikiData = inject('wikiData') as any
 const scores = inject('scores') as any
 
 watchEffect(() => {
   const cn = cnData.value?.find((item: any) => item.id === props.songId)
-  const wiki = wikiData.value?.find((item: any) => Number(item.songNo) === props.songId)
+  // const wiki = wikiData.value?.find((item: any) => Number(item.songNo) === props.songId)
 
   const score = scores.value?.find((s: any) => s.song_no === props.songId && s.level === props.selectLevel)
 
@@ -44,22 +44,17 @@ watchEffect(() => {
       }
       return '';
     })(),
-    bpm: (() => {
-      if (wiki?.bpm.min === wiki?.bpm.max) {
-        return wiki?.bpm.min || ''
+    score,
+    levels: (() => {
+      if (cn?.level_5 === '-') {
+        return [cn?.level_1, cn?.level_2, cn?.level_3, cn?.level_4];
       } else {
-        return `${wiki?.bpm.min || ''} - ${wiki?.bpm.max || ''}`
+        return [cn?.level_1, cn?.level_2, cn?.level_3, cn?.level_4, cn?.level_5];
       }
     })(),
-    artists: wiki?.artists.join(' / ') || '',
-    version: wiki?.version.join(' / ') || '',
-    levels: Object.values(wiki?.courses || {}).filter(Boolean).map((course: any, index) => ({
-      index: index + 1,
-      level: course?.level,
-      images: course?.images,
-    })),
-    scoreData: score || null,
   }
+
+  console.log('detail data', data.value)
 })
 
 const handleLevelChange = (newLevel: number) => {
@@ -69,14 +64,14 @@ const handleLevelChange = (newLevel: number) => {
 
 <template>
   <dialog ref="dialogRef" @click="closeDialog" class="fixed w-full h-full top-0 bg-black/50 flex z-1 touch-none">
-    <div @click.stop class="dialog-content bg-white rounded-xl m-auto shadow-xl w-200 h-[calc(100%-4rem)] flex overflow-hidden">
+    <div @click.stop class="dialog-content bg-white rounded-xl m-auto shadow-xl w-200 max-h-[calc(100%-4rem)] flex overflow-hidden">
       <div v-if="data" class="space-y-4 flex-1 overflow-y-auto p-4 overscroll-contain md:p-8">
         <!-- 歌曲ID -->
         <p class="text-gray text-sm">#{{ props.songId }}</p>
         <!-- 标题 -->
-        <div class="flex items-center space-x-2">
+        <div class="flex flex-col space-y-1">
           <p
-            class="text-sm px-2 py-1 rounded-full text-white text-shadow border-2 border-white"
+            class="text-sm w-max px-2 py-1 rounded-full text-white text-shadow border-2 border-white"
             :class="{
               'bg-blue-500' : data.type === '流行音乐',
               'bg-pink-500' : data.type === '动漫音乐',
@@ -90,10 +85,14 @@ const handleLevelChange = (newLevel: number) => {
           >
             {{ data.type }}
           </p>
-          <div>
-            <p class="text-xl">{{ data.title }}</p>
-            <p v-if="data.subtitle" class="text-sm text-gray-500">{{ data.subtitle }}</p>
-          </div>
+          <p class="text-xl">{{ data.title }}</p>
+          <p v-if="data.subtitle" class="text-sm text-gray-500">{{ data.subtitle }}</p>
+        </div>
+        <!-- 哔哩哔哩 -->
+        <div class="border-blue text-blue-500 bg-blue-50 border-2 rounded-lg flex w-max">
+          <img class="w-5 mx-2" src="/img/icon/bilibili.svg" alt="">
+          <p class="px-2 py-1 rounded-md hover:bg-blue-100">APP</p>
+          <p class="px-2 py-1 rounded-md hover:bg-blue-100">WEB</p>
         </div>
         <!-- 信息 -->
         <div class="space-y-1">
@@ -104,18 +103,6 @@ const handleLevelChange = (newLevel: number) => {
           <div class="flex items-center space-x-2 text-sm">
             <p class="text-gray-500">日文标题</p>
             <p class="flex-1 min-w-0">{{ data.titleJp }}</p>
-          </div>
-          <div class="flex items-center space-x-2 text-sm">
-            <p class="text-gray-500">作曲家</p>
-            <p class="flex-1 min-w-0">{{ data.artists }}</p>
-          </div>
-          <div class="flex items-center space-x-2 text-sm">
-            <p class="text-gray-500">收录版本</p>
-            <p class="flex-1 min-w-0">{{ data.version }}</p>
-          </div>
-          <div class="flex items-center space-x-2 text-sm">
-            <p class="text-gray-500">BPM</p>
-            <p class="flex-1 min-w-0">{{ data.bpm }}</p>
           </div>
           <!-- <div class="flex items-center space-x-2 text-sm">
             <p class="text-gray-500">别名</p>
@@ -130,65 +117,65 @@ const handleLevelChange = (newLevel: number) => {
         <div>
           <div class="flex items-end space-x-1 h-10">
             <div
-              v-for="level in data.levels"
-              @click="handleLevelChange(level.index)"
+              v-for="(level, index) in data.levels"
+              @click="handleLevelChange(index + 1)"
               class="relative w-15 rounded-t-lg border-2 border-b-none border-amber-950 overflow-hidden transition-all cursor-pointer hover:opacity-100"
               :class="{
-                'bg-red-300': level.index === 1,
-                'bg-lime-300': level.index === 2,
-                'bg-blue-300': level.index === 3,
-                'bg-pink-300': level.index === 4,
-                'bg-purple-300': level.index === 5,
-                'h-10 opacity-100': selectLevel === level.index,
-                'h-8 opacity-50': selectLevel !== level.index,
+                'bg-red-300': index + 1 === 1,
+                'bg-lime-300': index + 1 === 2,
+                'bg-blue-300': index + 1 === 3,
+                'bg-pink-300': index + 1 === 4,
+                'bg-purple-300': index + 1 === 5,
+                'h-10 opacity-100': selectLevel === index + 1,
+                'h-8 opacity-50': selectLevel !== index + 1,
               }"
             >
               <div class="absolute w-full h-full bg-gradient-to-b from-white/50 to-transparent"></div>
               <div class="relative w-full h-full flex items-center justify-center space-x-1">
-                <img class="w-6" :src="`/img/level/level_${level.index}.png`" alt="">
-                <p class="text-white font-bold text-xl text-border">{{ level.level }}</p>
+                <img class="w-6" :src="`/img/level/level_${index + 1}.png`" alt="">
+                <p class="text-white font-bold text-xl text-border">{{ level }}</p>
               </div>
             </div>
           </div>
-          <div class="w-full min-h-50 border-2 border-amber-950 rounded-lg rounded-tl-none overflow-hidden">
-            <div v-if="data.scoreData" class="p-2 grid grid-cols-3 gap-2">
+          <div class="w-full min-h-44 flex border-2 border-amber-950 rounded-lg rounded-tl-none overflow-hidden">
+            <div v-if="data.score" class="p-2 w-full grid grid-cols-3 gap-2">
               <div class="space-y-1 flex flex-col">
                 <div class="bg-red-400 text-white rounded-lg overflow-hidden text-center flex-1 flex flex-col">
                   <p class="p-1 bg-red-500 text-sm">历史最高得分</p>
                   <div class="flex-1 flex flex-col justify-center items-center">
-                    <p class="text-border m-auto text-white font-bold text-3xl tracking-widest">{{ data.scoreData?.high_score }}</p>
+                    <p class="text-border m-auto text-white font-bold text-3xl tracking-widest">{{ data.score?.high_score }}</p>
                   </div>
                 </div>
-                <p class="text-xs opacity-50 text-center">{{ data.scoreData?.highscore_datetime.replace(/\//g, '.') }}</p>
+                <p class="text-xs opacity-50 text-center">{{ data.score?.highscore_datetime.replace(/\//g, '.') }}</p>
                 <div class="grid grid-cols-2">
                   <div class="flex">
-                    <img class="m-auto w-15" :src="`/img/score_badge/score_${data.scoreData?.best_score_rank}.png`" alt=""></img>
+                    <img class="m-auto w-15" :src="`/img/score_badge/score_${data.score?.best_score_rank}.png`" alt=""></img>
                   </div>
                   <div class="flex">
-                    <img class="m-auto w-15" :src="`/img/crown/crown_${data.scoreData?.full_combo_cnt > 0 ? 'gold' : 'silver'}.png`" alt=""></img>
+                    <img class="m-auto w-15" :src="`/img/crown/crown_${data.score?.full_combo_cnt > 0 ? 'gold' : 'silver'}.png`" alt=""></img>
                   </div>
                 </div>
               </div>
               <div class="space-y-1 text-border text-white">
                 <div class="flex justify-between items-center bg-gradient-to-r from-orange-400 to-gray-300 px-2 py-0.5 rounded-lg">
                   <p class="text-border text-white">良</p>
-                  <p>{{ data.scoreData?.good_cnt }}</p>
+                  <p>{{ data.score?.good_cnt }}</p>
                 </div>
                 <div class="flex justify-between items-center bg-gradient-to-r from-gray-400 to-gray-300 px-2 py-0.5 rounded-lg">
                   <p class="text-border text-white">可</p>
-                  <p>{{ data.scoreData?.ok_cnt }}</p>
+                  <p>{{ data.score?.ok_cnt }}</p>
                 </div>
                 <div class="flex justify-between items-center bg-gradient-to-r from-blue-400 to-gray-300 px-2 py-0.5 rounded-lg">
                   <p class="text-border text-white">不可</p>
-                  <p>{{ data.scoreData?.ng_cnt }}</p>
+                  <p>{{ data.score?.ng_cnt }}</p>
                 </div>
                 <div class="flex justify-between items-center bg-gradient-to-r from-amber-400 to-gray-300 px-2 py-0.5 rounded-lg">
                   <p class="text-border text-white">连打数</p>
-                  <p>{{ data.scoreData?.pound_cnt }}</p>
+                  <p>{{ data.score?.pound_cnt }}</p>
                 </div>
                 <div class="flex justify-between items-center bg-gradient-to-r from-red-400 to-gray-300 px-2 py-0.5 rounded-lg">
                   <p class="text-border text-white">最大连击数</p>
-                  <p>{{ data.scoreData?.combo_cnt }}</p>
+                  <p>{{ data.score?.combo_cnt }}</p>
                 </div>
               </div>
               <div class="space-y-1 text-border text-white">
@@ -197,28 +184,28 @@ const handleLevelChange = (newLevel: number) => {
                 </div>
                 <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
                   <p>游玩次数</p>
-                  <p>{{ data.scoreData?.stage_cnt }}</p>
+                  <p>{{ data.score?.stage_cnt }}</p>
                 </div>
                 <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
                   <p>通关次数</p>
-                  <p>{{ data.scoreData?.clear_cnt }}</p>
+                  <p>{{ data.score?.clear_cnt }}</p>
                 </div>
                 <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
                   <p>全连次数</p>
-                  <p>{{ data.scoreData?.full_combo_cnt }}</p>
+                  <p>{{ data.score?.full_combo_cnt }}</p>
                 </div>
                 <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
                   <p>全良连段次数</p>
-                  <p>{{ data.scoreData?.dondaful_combo_cnt }}</p>
+                  <p>{{ data.score?.dondaful_combo_cnt }}</p>
                 </div>
               </div>
             </div>
-            <img v-for="image in data.levels[selectLevel - 1]?.images" :src="image" :key="image" alt="">
+            <div v-else class="m-auto flex flex-col items-center space-y-2 opacity-50">
+              <img class="w-35" src="/img/sticker/sticker_2.png" alt="">
+              <p>还没有该难度的游玩记录咚~</p>
+            </div>
           </div>
         </div>
-        <p class="bg-gradient-to-b from-amber-200 to-amber-400 text-border text-white w-max p-2 rounded ring-2 ring-amber-950">
-          编辑信息
-        </p>
       </div>
     </div>
   </dialog>
