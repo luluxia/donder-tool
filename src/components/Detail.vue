@@ -68,9 +68,9 @@ const handleLevelChange = (newLevel: number) => {
 </script>
 
 <template>
-  <dialog ref="dialogRef" @click="closeDialog" class="fixed w-screen h-screen top-0 bg-black/50 flex">
-    <div @click.stop class="dialog-content bg-white rounded-xl m-auto shadow-xl w-200 h-[calc(100vh-4rem)] flex overflow-hidden">
-      <div v-if="data" class="space-y-4 flex-1 overflow-y-auto p-8">
+  <dialog ref="dialogRef" @click="closeDialog" class="fixed w-full h-full top-0 bg-black/50 flex z-1 touch-none">
+    <div @click.stop class="dialog-content bg-white rounded-xl m-auto shadow-xl w-200 h-[calc(100%-4rem)] flex overflow-hidden">
+      <div v-if="data" class="space-y-4 flex-1 overflow-y-auto p-4 overscroll-contain md:p-8">
         <!-- 歌曲ID -->
         <p class="text-gray text-sm">#{{ props.songId }}</p>
         <!-- 标题 -->

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="absolute right-10 bottom-5 flex justify-center cursor-pointer transition-opacity"
+    class="fixed right-10 bottom-5 flex justify-center cursor-pointer transition-opacity touch-none"
     :class="isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'"
     @click="scrollToTop"
   >

@@ -288,7 +288,7 @@ const resetCaptcha = () => {
 </script>
 
 <template>
-  <div class="w-screen-xl mx-auto my-8 flex flex-col items-center gap-8 text-dark">
+  <div class="w-full max-w-screen-xl mx-auto my-8 flex flex-col items-center gap-8 text-dark">
     <!-- 玩家ID绑定 -->
     <div v-if="!scores.length" class="bg-white/50 w-100 rounded-xl p-4 border-white border-2 ring-2 ring-amber-950 space-y-4 flex flex-col items-center">
       <img class="w-30" src="/img/sticker/sticker_1.png" alt="">
@@ -341,7 +341,7 @@ const resetCaptcha = () => {
         <div class="space-y-2">
           <div class="flex items-center">
             <p class="w-15">分类</p>
-            <div class="flex space-x-2">
+            <div class="flex flex-1 min-w-0 flex-wrap gap-x-2 gap-y-1">
               <p
                 v-for="type in types" :key="type"
                 @click="selectedType = type"
@@ -354,7 +354,7 @@ const resetCaptcha = () => {
           </div>
           <div class="flex items-center">
             <p class="w-15">难度</p>
-            <div class="flex space-x-2">
+            <div class="flex flex-1 min-w-0 flex-wrap gap-x-2 gap-y-1">
               <p
                 v-for="level in levels" :key="level"
                 @click="selectedLevel = level"
@@ -367,7 +367,7 @@ const resetCaptcha = () => {
           </div>
           <div class="flex items-center">
             <p class="w-15">皇冠</p>
-            <div class="flex space-x-2">
+            <div class="flex flex-1 min-w-0 flex-wrap gap-x-2 gap-y-1">
               <p
                 v-for="crown in crowns" :key="crown"
                 @click="selectedCrown = crown"
@@ -380,7 +380,7 @@ const resetCaptcha = () => {
           </div>
           <div class="flex items-center">
             <p class="w-15">评价</p>
-            <div class="flex space-x-2">
+            <div class="flex flex-1 min-w-0 flex-wrap gap-x-2 gap-y-1">
               <p
                 v-for="rank in ranks" :key="rank"
                 @click="selectedRank = rank"
@@ -393,7 +393,7 @@ const resetCaptcha = () => {
           </div>
           <div class="flex items-center">
             <p class="w-15">排序</p>
-            <div class="flex space-x-2">
+            <div class="flex flex-1 min-w-0 flex-wrap gap-x-2 gap-y-1">
               <div
                 v-for="sort in sorts" :key="sort"
                 @click="selectSort(sort)"
@@ -417,7 +417,7 @@ const resetCaptcha = () => {
           v-for="(score, index) in filteredScores"
           :key="index"
           @click="handleOpenDetail(score.songId, score.level)"
-          class="p-4 rounded-xl flex justify-between items-center [content-visibility:auto] transition-colors hover:(bg-black/5) cursor-pointer"
+          class="p-4 rounded-xl flex flex-col gap-1 justify-between [content-visibility:auto] transition-colors hover:(bg-black/5) md:(flex-row items-center)"
         >
           <div class="flex items-center space-x-2">
             <p
@@ -434,14 +434,14 @@ const resetCaptcha = () => {
                 'bg-red-500' : score.type === '南梦宫原创音乐',
               }"
             >
-              {{ score.type }}
+              {{ score.type.replace('音乐', '') }}
             </p>
-            <div>
+            <div class="flex-1 min-w-0">
               <p class="text-xl">{{ score.song_name }}</p>
               <p v-if="score.subtitle" class="text-sm text-gray-500">{{ score.subtitle }}</p>
             </div>
           </div>
-          <div class="flex space-x-4 items-center">
+          <div class="flex space-x-4 items-center justify-end w-75 rounded-xl mx-auto bg-black/5 p-2 md:(mx-0 p-0 bg-transparent)">
             <!-- 皇冠 -->
             <img v-if="score.crown" class="w-10" :src="`/img/crown/crown_${score.crown}.png`" alt="">
             <!-- 评价 -->

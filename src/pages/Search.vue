@@ -103,7 +103,7 @@ const handleOpenDetail = (songId: number, level: number) => {
 </script>
 
 <template>
-  <div class="w-full max-w-screen-xl mx-auto my-8 px-4 flex flex-col items-center gap-8 text-dark">
+  <div class="w-full max-w-screen-xl mx-auto my-8 flex flex-col items-center gap-8 text-dark">
     <div class="bg-white/50 w-full rounded-xl p-4 border-white border-2 ring-2 ring-amber-950 space-y-4">
       <!-- 搜索 -->
       <div class="relative flex items-center">

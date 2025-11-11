@@ -51,7 +51,7 @@ onMounted(async () => {
     <div class="absolute w-full h-50 bg-gradient-to-b from-amber-400 to-transparent"></div>
   </div>
   <!-- 内容 -->
-  <div ref="scrollContainer" class="w-screen h-screen overflow-auto [scrollbar-gutter:stable_both-edges]">
+  <div ref="scrollContainer" class="w-screen h-screen overflow-auto px-2 [scrollbar-gutter:stable_both-edges] md:px-6">
     <div class="w-full h-50 flex flex-col items-center mb-12">
       <div class="w-full max-w-screen-xl p-4 flex justify-between items-center">
         <div class="text-amber-800 flex space-x-2">
