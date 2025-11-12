@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, inject, watchEffect } from 'vue'
+import { X } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 
 const emit = defineEmits(['update:visible', 'update:select-level'])
 
@@ -20,12 +22,12 @@ const props = defineProps<{
 
 const data = ref()
 
-const cnData = inject('cnData') as any
+const songData = inject('songData') as any
 // const wikiData = inject('wikiData') as any
 const scores = inject('scores') as any
 
 watchEffect(() => {
-  const cn = cnData.value?.find((item: any) => item.id === props.songId)
+  const cn = songData.value?.find((item: any) => item.id === props.songId)
   // const wiki = wikiData.value?.find((item: any) => Number(item.songNo) === props.songId)
 
   const score = scores.value?.find((s: any) => s.song_no === props.songId && s.level === props.selectLevel)
@@ -60,14 +62,28 @@ watchEffect(() => {
 const handleLevelChange = (newLevel: number) => {
   emit('update:select-level', newLevel)
 }
+
+// 复制标题
+const copyTitle = () => {
+  if (data.value?.title) {
+    navigator.clipboard.writeText(data.value.title)
+    toast.success('已复制歌曲标题到剪贴板咚~')
+  }
+}
+
 </script>
 
 <template>
-  <dialog ref="dialogRef" @click="closeDialog" class="fixed w-full h-full top-0 bg-black/50 flex z-1 touch-none">
-    <div @click.stop class="dialog-content bg-white rounded-xl m-auto shadow-xl w-200 max-h-[calc(100%-4rem)] flex overflow-hidden">
-      <div v-if="data" class="space-y-4 flex-1 overflow-y-auto p-4 overscroll-contain md:p-8">
+  <dialog ref="dialogRef" @click="closeDialog" class="fixed w-full h-full top-0 bg-black/50 flex z-1">
+    <div @click.stop class="dialog-content relative bg-white rounded-xl m-auto shadow-xl w-200 max-w-full max-h-[calc(100%-4rem)] flex overflow-hidden">
+      <div class="absolute right-4 top-4">
+        <button @click="closeDialog" class="p-2 rounded-full transition-colors hover:bg-gray-200">
+          <X class="w-6 h-6 text-gray-600" />
+        </button>
+      </div>
+      <div v-if="data" class="space-y-2 flex-1 overflow-y-auto p-4 overscroll-contain md:p-8">
         <!-- 歌曲ID -->
-        <p class="text-gray text-sm">#{{ props.songId }}</p>
+        <!-- <p @click="copySongId" class="text-gray text-sm cursor-pointer">#{{ props.songId }}</p> -->
         <!-- 标题 -->
         <div class="flex flex-col space-y-1">
           <p
@@ -85,14 +101,22 @@ const handleLevelChange = (newLevel: number) => {
           >
             {{ data.type }}
           </p>
-          <p class="text-xl">{{ data.title }}</p>
+          <p @click="copyTitle" class="text-xl cursor-pointer w-max max-w-full">{{ data.title }}</p>
           <p v-if="data.subtitle" class="text-sm text-gray-500">{{ data.subtitle }}</p>
         </div>
         <!-- 哔哩哔哩 -->
         <div class="border-blue text-blue-500 bg-blue-50 border-2 rounded-lg flex w-max">
           <img class="w-5 mx-2" src="/img/icon/bilibili.svg" alt="">
-          <p class="px-2 py-1 rounded-md hover:bg-blue-100">APP</p>
-          <p class="px-2 py-1 rounded-md hover:bg-blue-100">WEB</p>
+          <a
+            :href="`bilibili://search?keyword=${encodeURIComponent(`太鼓达人 ${data.title}`)}`"
+            target="_blank"
+            class="px-2 py-1 rounded-md hover:bg-blue-100"
+          >APP</a>
+          <a
+            :href="`https://search.bilibili.com/all?keyword=${encodeURIComponent(`太鼓达人 ${data.title}`)}`"
+            target="_blank"
+            class="px-2 py-1 rounded-md hover:bg-blue-100"
+          >WEB</a>
         </div>
         <!-- 信息 -->
         <div class="space-y-1">
@@ -138,7 +162,7 @@ const handleLevelChange = (newLevel: number) => {
             </div>
           </div>
           <div class="w-full min-h-44 flex border-2 border-amber-950 rounded-lg rounded-tl-none overflow-hidden">
-            <div v-if="data.score" class="p-2 w-full grid grid-cols-3 gap-2">
+            <div v-if="data.score" class="p-2 w-full grid grid-cols-2 gap-2 md:grid-cols-3">
               <div class="space-y-1 flex flex-col">
                 <div class="bg-red-400 text-white rounded-lg overflow-hidden text-center flex-1 flex flex-col">
                   <p class="p-1 bg-red-500 text-sm">历史最高得分</p>
@@ -178,25 +202,27 @@ const handleLevelChange = (newLevel: number) => {
                   <p>{{ data.score?.combo_cnt }}</p>
                 </div>
               </div>
-              <div class="space-y-1 text-border text-white">
+              <div class="space-y-1 text-border text-white col-span-2 md:col-span-1">
                 <div class="flex justify-center items-center bg-gray-200 px-2 py-0.5 rounded-lg">
                   <p>游玩统计</p>
                 </div>
-                <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                  <p>游玩次数</p>
-                  <p>{{ data.score?.stage_cnt }}</p>
-                </div>
-                <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                  <p>通关次数</p>
-                  <p>{{ data.score?.clear_cnt }}</p>
-                </div>
-                <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                  <p>全连次数</p>
-                  <p>{{ data.score?.full_combo_cnt }}</p>
-                </div>
-                <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                  <p>全良连段次数</p>
-                  <p>{{ data.score?.dondaful_combo_cnt }}</p>
+                <div class="grid grid-cols-2 gap-1 md:grid-cols-1">
+                  <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                    <p>游玩次数</p>
+                    <p>{{ data.score?.stage_cnt }}</p>
+                  </div>
+                  <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                    <p>通关次数</p>
+                    <p>{{ data.score?.clear_cnt }}</p>
+                  </div>
+                  <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                    <p>全连次数</p>
+                    <p>{{ data.score?.full_combo_cnt }}</p>
+                  </div>
+                  <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                    <p>全良连段次数</p>
+                    <p>{{ data.score?.dondaful_combo_cnt }}</p>
+                  </div>
                 </div>
               </div>
             </div>

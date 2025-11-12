@@ -2,7 +2,7 @@
 import { ref, computed, inject, type Ref } from 'vue'
 import { Search, Info, ChevronDown, ChevronUp } from 'lucide-vue-next'
 
-const songs = inject('cnData') as any
+const songs = inject('songData') as any
 
 const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
 const selectedType = ref('全部')
@@ -127,19 +127,6 @@ const handleOpenDetail = (songId: number, level: number) => {
               :class="{ 'text-border !bg-amber-400 text-white': selectedType === type }"
             >
               {{ type }}
-            </p>
-          </div>
-        </div>
-        <div class="flex items-center">
-          <p class="w-15">标签</p>
-          <div class="flex flex-1 min-w-0 flex-wrap gap-x-2 gap-y-1">
-            <p
-              v-for="tag in tags" :key="tag"
-              @click="toggleTag(tag)"
-              class="text-amber-950 px-2 py-0.5 rounded cursor-pointer transition-colors hover:bg-amber-400/50"
-              :class="{ 'text-border !bg-amber-400 text-white': selectedTags.includes(tag) }"
-            >
-              {{ tag }}
             </p>
           </div>
         </div>

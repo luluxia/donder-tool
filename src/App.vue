@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onMounted, provide, ref } from 'vue'
 import { HelpCircle, LogIn, Drum } from 'lucide-vue-next'
+import 'vue-sonner/style.css'
+import { Toaster } from 'vue-sonner'
 import { useRoute } from 'vue-router'
 import Detail from './components/Detail.vue'
 import BackToTop from './components/BackToTop.vue'
@@ -18,23 +20,23 @@ provide('detailSongId', detailSongId)
 provide('detailLevel', detailLevel)
 provide('scrollContainer', scrollContainer)
 
-const cnData = ref()
-const wikiData = ref()
+const songData = ref()
+// const wikiData = ref()
 
 const userId = ref()
 provide('userId', userId)
 const scores = ref([])
 
-provide('cnData', cnData)
-provide('wikiData', wikiData)
+provide('songData', songData)
+// provide('wikiData', wikiData)
 provide('scores', scores)
 
 onMounted(async () => {
-  const cnResponse = await fetch('/data/cn.json')
-  cnData.value = await cnResponse.json()
+  const songResponse = await fetch('/data/song.json')
+  songData.value = await songResponse.json()
 
-  const wikiResponse = await fetch('/data/wiki.json')
-  wikiData.value = await wikiResponse.json()
+  // const wikiResponse = await fetch('/data/wiki.json')
+  // wikiData.value = await wikiResponse.json()
 
   // const scoreResponse = await fetch('/songscore.json')
   // const scoreData = await scoreResponse.json()
@@ -45,6 +47,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  <Toaster position="top-center" richColors />
   <!-- 背景 -->
   <div class="fixed w-screen h-screen -z-1">
     <img class="absolute w-full h-full object-cover" src="/img/bg.png" alt="" />

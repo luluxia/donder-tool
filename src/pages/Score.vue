@@ -290,7 +290,7 @@ const resetCaptcha = () => {
 <template>
   <div class="w-full max-w-screen-xl mx-auto my-8 flex flex-col items-center gap-8 text-dark">
     <!-- 玩家ID绑定 -->
-    <div v-if="!scores.length" class="bg-white/50 w-100 rounded-xl p-4 border-white border-2 ring-2 ring-amber-950 space-y-4 flex flex-col items-center">
+    <div v-if="!scores.length" class="bg-white/50 w-100 max-w-full rounded-xl p-4 border-white border-2 ring-2 ring-amber-950 space-y-4 flex flex-col items-center">
       <img class="w-30" src="/img/sticker/sticker_1.png" alt="">
       <input
         v-model="userId"
