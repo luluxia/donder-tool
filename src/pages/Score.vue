@@ -55,9 +55,9 @@ const filteredScores = computed(() => {
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter((score: any) =>
-      score.score_name.toLowerCase().includes(query) ||
-      (score.subtitle && typeof score.subtitle === 'string' && score.subtitle.toLowerCase().includes(query)) ||
-      score.score_name_jp.toLowerCase().includes(query)
+      score.song_detail?.song_name?.toLowerCase().includes(query) ||
+      score.song_detail?.subtitle?.toLowerCase().includes(query) ||
+      score.song_detail?.song_name_jp?.toLowerCase().includes(query)
     )
   }
 
@@ -200,7 +200,6 @@ const getScore = async (id: number) => {
     return { scores: [], updateTime: '' }
   }
   const scores = JSON.parse(resData.data)
-  console.log(scores)
   const date = new Date(resData.updated_at)
   const updateTime = `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
   return { scores, updateTime }

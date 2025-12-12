@@ -57,7 +57,6 @@ watchEffect(() => {
     })(),
   }
 
-  console.log('detail data', data.value)
 })
 
 const handleLevelChange = (newLevel: number) => {

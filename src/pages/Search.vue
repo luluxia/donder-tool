@@ -6,21 +6,21 @@ const songs = inject('songData') as any
 
 const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
 const selectedType = ref('全部')
-const tags = ['魔王里', '双打', '华语', '谱面分歧']
-const selectedTags = ref<string[]>([])
+// const tags = ['魔王里', '双打', '华语', '谱面分歧']
+// const selectedTags = ref<string[]>([])
 const sorts = ['默认', '简单', '一般', '困难', '魔王', '魔王里', '上线日期']
 const selectedSort = ref('默认')
 const sortDirection = ref<'asc' | 'desc'>('desc')
 const searchQuery = ref('')
 
-const toggleTag = (tag: string) => {
-  const index = selectedTags.value.indexOf(tag)
-  if (index > -1) {
-    selectedTags.value.splice(index, 1)
-  } else {
-    selectedTags.value.push(tag)
-  }
-}
+// const toggleTag = (tag: string) => {
+//   const index = selectedTags.value.indexOf(tag)
+//   if (index > -1) {
+//     selectedTags.value.splice(index, 1)
+//   } else {
+//     selectedTags.value.push(tag)
+//   }
+// }
 
 const selectSort = (sort: string) => {
   if (sort === '默认') {
