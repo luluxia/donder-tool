@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { onMounted, provide, ref } from 'vue'
-import { HelpCircle, LogIn, Drum } from 'lucide-vue-next'
+import { HelpCircle, Drum } from 'lucide-vue-next'
 import 'vue-sonner/style.css'
 import { Toaster } from 'vue-sonner'
 import { useRoute } from 'vue-router'
 import Detail from './components/Detail.vue'
+import About from './components/About.vue'
 import BackToTop from './components/BackToTop.vue'
+import axios from 'axios'
 
 const route = useRoute()
 
 const scrollContainer = ref()
 
+const aboutVisible = ref(false)
 const detailVisible = ref(false)
 const detailSongId = ref()
 const detailLevel = ref()
@@ -32,15 +35,8 @@ provide('songData', songData)
 provide('scores', scores)
 
 onMounted(async () => {
-  const songResponse = await fetch('/data/song.json')
-  songData.value = await songResponse.json()
-
-  // const wikiResponse = await fetch('/data/wiki.json')
-  // wikiData.value = await wikiResponse.json()
-
-  // const scoreResponse = await fetch('/songscore.json')
-  // const scoreData = await scoreResponse.json()
-  // scores.value = scoreData.scoreInfo
+  const songResponse = await axios.get('https://hasura.llx.life/api/rest/donder/get-song')
+  songData.value = JSON.parse(songResponse.data.song.data)
 
   localStorage.getItem('userId') && (userId.value = localStorage.getItem('userId') || '')
 })
@@ -62,7 +58,7 @@ onMounted(async () => {
           <p>Donder 查分器</p>
         </div>
         <div class="flex space-x-2">
-          <div class="text-amber-800 p-2 rounded-full w-10 h-10 flex hover:bg-black/5">
+          <div @click="aboutVisible = true" class="text-amber-800 p-2 rounded-full w-10 h-10 flex transition-colors hover:bg-black/5 cursor-pointer">
             <HelpCircle class="m-auto" />
           </div>
         </div>
@@ -101,6 +97,12 @@ onMounted(async () => {
       v-model:visible="detailVisible"
       v-model:select-level="detailLevel"
       :song-id="detailSongId"
+    />
+  </transition>
+  <transition name="dialog-fade">
+    <About
+      v-if="aboutVisible"
+      v-model:visible="aboutVisible"
     />
   </transition>
   <BackToTop />

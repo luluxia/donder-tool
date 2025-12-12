@@ -2,6 +2,7 @@
 import { onMounted, ref, inject, watchEffect } from 'vue'
 import { X } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+import Button from './Button.vue'
 
 const emit = defineEmits(['update:visible', 'update:select-level'])
 
@@ -71,6 +72,11 @@ const copyTitle = () => {
   }
 }
 
+const jumpToWiki = () => {
+  const wikiUrl = `https://taiko.wiki/song/${props.songId}`
+  window.open(wikiUrl, '_blank')
+}
+
 </script>
 
 <template>
@@ -83,7 +89,7 @@ const copyTitle = () => {
       </div>
       <div v-if="data" class="space-y-2 flex-1 overflow-y-auto p-4 overscroll-contain md:p-8">
         <!-- 歌曲ID -->
-        <!-- <p @click="copySongId" class="text-gray text-sm cursor-pointer">#{{ props.songId }}</p> -->
+        <p class="text-gray text-sm">#{{ props.songId }}</p>
         <!-- 标题 -->
         <div class="flex flex-col space-y-1">
           <p
@@ -101,11 +107,11 @@ const copyTitle = () => {
           >
             {{ data.type }}
           </p>
-          <p @click="copyTitle" class="text-xl cursor-pointer w-max max-w-full">{{ data.title }}</p>
+          <p @click="copyTitle" class="text-xl cursor-pointer w-max max-w-full">{{ data.title || '未知曲目' }}</p>
           <p v-if="data.subtitle" class="text-sm text-gray-500">{{ data.subtitle }}</p>
         </div>
         <!-- 哔哩哔哩 -->
-        <div class="border-blue text-blue-500 bg-blue-50 border-2 rounded-lg flex w-max">
+        <div v-if="data.title" class="border-blue text-blue-500 bg-blue-50 border-2 rounded-lg flex w-max">
           <img class="w-5 mx-2" src="/img/icon/bilibili.svg" alt="">
           <a
             :href="`bilibili://search?keyword=${encodeURIComponent(`太鼓达人 ${data.title}`)}`"
@@ -119,7 +125,7 @@ const copyTitle = () => {
           >WEB</a>
         </div>
         <!-- 信息 -->
-        <div class="space-y-1">
+        <div v-if="data.title" class="space-y-1">
           <div class="flex items-center space-x-2 text-sm">
             <p class="text-gray-500">上线日期</p>
             <p class="flex-1 min-w-0">{{ data.openDay }}</p>
@@ -231,6 +237,9 @@ const copyTitle = () => {
               <p>还没有该难度的游玩记录咚~</p>
             </div>
           </div>
+        </div>
+        <div>
+          <Button @click="jumpToWiki" class="w-full mt-4">Taiko Wiki</Button>
         </div>
       </div>
     </div>

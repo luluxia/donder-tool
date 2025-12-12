@@ -8,7 +8,7 @@ const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博�
 const selectedType = ref('全部')
 const tags = ['魔王里', '双打', '华语', '谱面分歧']
 const selectedTags = ref<string[]>([])
-const sorts = ['默认', '简单', '一般', '困难', '魔王', '魔王里']
+const sorts = ['默认', '简单', '一般', '困难', '魔王', '魔王里', '上线日期']
 const selectedSort = ref('默认')
 const sortDirection = ref<'asc' | 'desc'>('desc')
 const searchQuery = ref('')
@@ -84,6 +84,12 @@ const filteredSongs = computed(() => {
       const bLevel = b.level_5 && b.level_5 !== '-' ? parseInt(String(b.level_5)) : parseInt(String(b.level_4))
       return multiplier * (aLevel - bLevel)
     })
+  } else if (sortKey === '上线日期') {
+    filtered = [...filtered].sort((a, b) => {
+      const dateA = new Date(a.open_day).getTime()
+      const dateB = new Date(b.open_day).getTime()
+      return multiplier * (dateA - dateB)
+    })
   }
 
   return filtered
@@ -111,7 +117,7 @@ const handleOpenDetail = (songId: number, level: number) => {
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="请输入歌曲名称、作曲家，或者别名咚~"
+          placeholder="搜索曲目咚~"
           class="w-full pl-12 p-4 bg-white rounded-xl border-white border-2 ring-2 ring-amber-950 outline-none"
         >
       </div>

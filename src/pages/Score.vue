@@ -2,7 +2,7 @@
 import { computed, inject, onMounted, ref, type Ref } from 'vue'
 import { Search, Info, ChevronDown, ChevronUp } from 'lucide-vue-next'
 import Button from '../components/Button.vue'
-import Cap from '@cap.js/widget'
+import { toast } from 'vue-sonner'
 import axios from 'axios'
 
 const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
@@ -195,62 +195,71 @@ const getScore = async (id: number) => {
   const res = await axios.get('https://hasura.llx.life/api/rest/donder/get-score', {
     params: { id }
   })
-  const data = res.data.score.data
-  const scores = typeof data === 'string' ? JSON.parse(data) : data || []
-  const updateTime = new Date(res.data.score.updated_at).toLocaleString().replace(/\//g, '.')
-  console.log('Fetched scores:', scores)
+  const resData = res.data.score
+  if (!resData) {
+    return { scores: [], updateTime: '' }
+  }
+  const scores = JSON.parse(resData.data)
+  console.log(scores)
+  const date = new Date(resData.updated_at)
+  const updateTime = `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
   return { scores, updateTime }
 }
 
 const bindLoading = ref(false)
-const bindError = ref('')
-const handleBind = async (refresh: boolean = false) => {
-  if (!captchaToken.value && userId.value) {
-    return
-  }
-  const id = userId.value
-  localStorage.setItem('userId', `${id}`)
-  bindLoading.value = true
 
-  if (refresh) {
-    const { scores: newScores, updateTime: newUpdateTime } = await getScore(id!)
-    scores.value = newScores
-    updateTime.value = newUpdateTime
-    bindLoading.value = false
-    return
-  }
-
-  axios.post('http://localhost:7001/refresh_score', {
-    id,
-    token: captchaToken.value
-  }).then(res => {
-    if (res.data.code) {
-      getScore(id!).then(({ scores: newScores, updateTime: newUpdateTime }) => {
-        scores.value = newScores
-        updateTime.value = newUpdateTime
-      }).finally(() => {
-        bindLoading.value = false
-      })
-    } else {
-      bindError.value = res.data.message
-      bindLoading.value = false
-      resetCaptcha()
-    }
-  }).catch(() => {
-    bindError.value = '绑定失败，请稍后重试咚~'
-    bindLoading.value = false
-    resetCaptcha()
-  })
+const refreshScore = (id: number) => {
+  return axios.post('https://donder.llx.life/refresh_score', { id: Number(id) })
 }
 
-const handleRefresh = async () => {
+const handleBindClick = async () => {
+  if (!userId.value) return
+  const id = userId.value
+  localStorage.setItem('userId', id.toString())
   bindLoading.value = true
-  const cap = new Cap({
-    apiEndpoint: 'https://capjs.llx.life/8da786bced/',
-  })
-  const solution = await cap.solve()
-  captchaToken.value = solution.token
-  await handleBind(true)
+
+  try {
+    let { scores: fetchedScores, updateTime: fetchedTime } = await getScore(id)
+    
+    if (!fetchedScores || fetchedScores.length === 0) {
+      const res = await refreshScore(id)
+      if (res.data.success) {
+        const result = await getScore(id)
+        fetchedScores = result.scores
+        fetchedTime = result.updateTime
+      } else {
+        toast.error(res.data.error || '绑定失败，请稍后重试咚~')
+      }
+    }
+    
+    scores.value = fetchedScores
+    updateTime.value = fetchedTime
+    toast.success('绑定成功咚~')
+  } catch (e: any) {
+    toast.error(e.message || '绑定失败，请稍后重试咚~')
+  } finally {
+    bindLoading.value = false
+  }
+}
+
+const handleSyncClick = async () => {
+  if (!userId.value) return
+  const id = userId.value
+  bindLoading.value = true
+
+  try {
+    const res = await refreshScore(id)
+    if (res.data.success) {
+      const { scores: newScores, updateTime: newUpdateTime } = await getScore(id)
+      scores.value = newScores
+      updateTime.value = newUpdateTime
+      toast.success('同步成功咚~')
+    }
+  } catch (e: any) {
+    toast.error(e.response?.data?.error || '同步失败，请稍后重试咚~')
+  } finally {
+    bindLoading.value = false
+  }
 }
 
 const handleUnbind = () => {
@@ -259,9 +268,29 @@ const handleUnbind = () => {
   scores.value = []
 }
 
+const handleExport = () => {
+  if (!scores.value || scores.value.length === 0) {
+    toast.error('暂无成绩可导出咚~')
+    return
+  }
+
+  const dataStr = JSON.stringify(scores.value, null, 2)
+  const blob = new Blob([dataStr], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `taiko_scores_${userId.value || 'unknown'}.json`
+  document.body.appendChild(link)
+  link.click()
+  
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+  toast.success('导出成功咚~')
+}
+
 const updateTime = ref('')
 onMounted(() => {
-  Cap
   if (localStorage.getItem('userId')) {
     userId.value = Number(localStorage.getItem('userId')) || null
     // 自动加载成绩
@@ -272,19 +301,6 @@ onMounted(() => {
   }
 })
 
-const captchaToken = ref('');
-
-(window as any).handleCaptchaSolved = (e: any) => {
-  console.log("Captcha solved with token:", e.detail.token)
-  captchaToken.value = e.detail.token
-}
-
-const resetCaptcha = () => {
-  const widget = document.querySelector('#cap') as any
-  if (widget && widget.reset) {
-    widget.reset()
-  }
-}
 </script>
 
 <template>
@@ -298,32 +314,28 @@ const resetCaptcha = () => {
         placeholder="请输入要查询成绩的玩家ID咚~"
         class="w-full p-4 bg-white rounded-xl border-white border-2 ring-2 ring-amber-950 outline-none"
       >
-      <p v-if="bindError" class="text-red-400">{{ bindError }}</p>
-      <cap-widget
-        id="cap"
-        data-cap-api-endpoint="https://capjs.llx.life/8da786bced/"
-        data-cap-i18n-verifying-label="验证中..."
-        data-cap-i18n-initial-state="我是人类咚~"
-        data-cap-i18n-solved-label="验证通过咚~"
-        data-cap-i18n-error-label="验证失败"
-        onsolve="handleCaptchaSolved"
-      ></cap-widget>
-      <Button class="px-8" @click="handleBind" :disabled="!captchaToken || !userId || bindLoading">
-        {{ bindLoading ? '绑定中...' : '确认' }}
-      </Button>
+      <div @click="handleBindClick()">
+        <Button :disabled="!userId || bindLoading">
+          {{ bindLoading ? '绑定中...' : '确认' }}
+        </Button>
+      </div>
     </div>
     <!-- 查询结果 -->
     <template v-else>
       <div class="bg-white/50 w-full rounded-xl p-4 border-white border-2 ring-2 ring-amber-950 flex justify-between items-center">
         <div>
           <p>同步时间：{{ updateTime }}</p>
-          <p class="text-amber-600 cursor-pointer hover:underline" @click="handleUnbind">解除绑定</p>
+          <div class="flex space-x-2">
+            <p class="text-amber-600 cursor-pointer hover:underline" @click="handleUnbind">解除绑定</p>
+            <p class="text-amber-600 cursor-pointer hover:underline" @click="handleExport">导出成绩</p>
+          </div>
         </div>
         <div class="flex items-center space-x-4">
-          <p v-if="bindError" class="text-red-400">{{ bindError }}</p>
-          <Button class="px-4" @click="handleRefresh" :disabled="bindLoading">
-            {{ bindLoading ? '同步中...' : '同步成绩' }}
-          </Button>
+          <div @click="handleSyncClick()">
+            <Button :disabled="bindLoading">
+              {{ bindLoading ? '同步中...' : '同步成绩' }}
+            </Button>
+          </div>
         </div>
       </div>
       <div class="bg-white/50 w-full rounded-xl p-4 border-white border-2 ring-2 ring-amber-950 space-y-4">
@@ -333,7 +345,7 @@ const resetCaptcha = () => {
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="请输入歌曲名称、作曲家，或者别名咚~"
+            placeholder="搜索曲目咚~"
             class="w-full pl-12 p-4 bg-white rounded-xl border-white border-2 ring-2 ring-amber-950 outline-none"
           >
         </div>
