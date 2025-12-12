@@ -46,7 +46,7 @@ onMounted(async () => {
   <Toaster position="top-center" richColors />
   <!-- 背景 -->
   <div class="fixed w-screen h-screen -z-1">
-    <img class="absolute w-full h-full object-cover" src="/img/bg.png" alt="" />
+    <img class="absolute w-full h-full object-cover" src="/img/bg.webp" alt="" />
     <div class="absolute w-full h-50 bg-gradient-to-b from-amber-400 to-transparent"></div>
   </div>
   <!-- 内容 -->
@@ -64,7 +64,7 @@ onMounted(async () => {
         </div>
       </div>
       <div>
-        <img class="w-80" src="/img/logo.png" alt="" />
+        <img class="w-80" src="/img/logo.webp" alt="" />
       </div>
     </div>
     <div class="w-full max-w-screen-xl mx-auto my-8 flex flex-col items-center gap-8 text-dark">
