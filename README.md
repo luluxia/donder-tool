@@ -10,7 +10,6 @@
 
 ## 资源致谢
 
-- 源代码：[luluxia/donder-tool](https://github.com/luluxia/donder-tool)
 - 图片素材：[spriters-resource.com](https://www.spriters-resource.com/arcade/taikonotatsujin2020version/)
 
 ## 友情链接
