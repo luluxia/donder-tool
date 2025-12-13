@@ -2,6 +2,7 @@
 import { computed, inject, onMounted, ref, type Ref } from 'vue'
 import { Search, Info, ChevronDown, ChevronUp } from 'lucide-vue-next'
 import Button from '../components/Button.vue'
+import TogglePublicDialog from '../components/TogglePublicDialog.vue'
 import { toast } from 'vue-sonner'
 import axios from 'axios'
 
@@ -191,6 +192,7 @@ const filteredScores = computed(() => {
   })
 })
 
+const isPublic = ref(false)
 const getScore = async (id: number) => {
   const res = await axios.get('https://hasura.llx.life/api/rest/donder/get-score', {
     params: { id }
@@ -202,6 +204,7 @@ const getScore = async (id: number) => {
   const scores = JSON.parse(resData.data)
   const date = new Date(resData.updated_at)
   const updateTime = `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+  isPublic.value = resData.isPublic
   return { scores, updateTime }
 }
 
@@ -211,6 +214,7 @@ const refreshScore = (id: number) => {
   return axios.post('https://donder.llx.life/refresh_score', { id: Number(id) })
 }
 
+const authHintVisible = ref(false)
 const handleBindClick = async () => {
   if (!userId.value) return
   const id = userId.value
@@ -218,24 +222,41 @@ const handleBindClick = async () => {
   bindLoading.value = true
 
   try {
-    let { scores: fetchedScores, updateTime: fetchedTime } = await getScore(id)
-    
-    if (!fetchedScores || fetchedScores.length === 0) {
-      const res = await refreshScore(id)
-      if (res.data.success) {
-        const result = await getScore(id)
-        fetchedScores = result.scores
-        fetchedTime = result.updateTime
-      } else {
-        toast.error(res.data.error || '绑定失败，请稍后重试咚~')
+    const res = await axios.post('https://donder.llx.life/auth', { id: Number(id) })
+
+    if (res.data.success) {
+      if (res.data.token) {
+        // 绑定成功
+        localStorage.setItem('token', res.data.token)
+        axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
+        let { scores: fetchedScores, updateTime: fetchedTime } = await getScore(id)
+        
+        if (!fetchedScores || fetchedScores.length === 0) {
+          const res = await refreshScore(id)
+          if (res.data.success) {
+            const result = await getScore(id)
+            fetchedScores = result.scores
+            fetchedTime = result.updateTime
+          } else {
+            toast.error(res.data.error || '绑定失败，请稍后重试咚~')
+          }
+        }
+        
+        scores.value = fetchedScores
+        updateTime.value = fetchedTime
+        toast.success('绑定成功咚~')
+      } else if (res.data.needAuth) {
+        // 需要二次验证
+        toast.info(res.data.message)
+        authHintVisible.value = true
+        bindLoading.value = false
+        return
       }
+    } else {
+      toast.error(res.data.error || '绑定失败，请稍后重试咚~')
     }
-    
-    scores.value = fetchedScores
-    updateTime.value = fetchedTime
-    toast.success('绑定成功咚~')
   } catch (e: any) {
-    toast.error(e.message || '绑定失败，请稍后重试咚~')
+    toast.error(e.response?.data?.error || '绑定失败，请稍后重试咚~')
   } finally {
     bindLoading.value = false
   }
@@ -289,6 +310,32 @@ const handleExport = () => {
 }
 
 const updateTime = ref('')
+
+// 公开/隐藏成绩
+const togglePublicDialogVisible = ref(false)
+
+const handleTogglePublic = () => {
+  togglePublicDialogVisible.value = true
+}
+
+const handleConfirmTogglePublic = async () => {
+  if (!userId.value) return
+
+  try {
+    const res = await axios.post('https://donder.llx.life/update_public', { isPublic: !isPublic.value })
+    if (res.data.success) {
+      isPublic.value = !isPublic.value
+      toast.success(isPublic.value ? '成绩已公开咚~' : '成绩已隐藏咚~')
+    } else {
+      toast.error(res.data.error || '操作失败，请稍后重试咚~')
+    }
+  } catch (e: any) {
+    toast.error(e.response?.data?.error || '操作失败，请稍后重试咚~')
+  } finally {
+    togglePublicDialogVisible.value = false
+  }
+}
+
 onMounted(() => {
   if (localStorage.getItem('userId')) {
     userId.value = Number(localStorage.getItem('userId')) || null
@@ -313,6 +360,9 @@ onMounted(() => {
         placeholder="请输入要查询成绩的玩家ID咚~"
         class="w-full p-4 bg-white rounded-xl border-white border-2 ring-2 ring-amber-950 outline-none"
       >
+      <p v-if="authHintVisible" class="text-sm text-rose-600 text-center max-w-xs">
+        请在五分钟内，前往“鼓众广场”小程序更换与当前不一样的头部肤色以完成验证咚~
+      </p>
       <div @click="handleBindClick()">
         <Button :disabled="!userId || bindLoading">
           {{ bindLoading ? '绑定中...' : '确认' }}
@@ -327,6 +377,9 @@ onMounted(() => {
           <div class="flex space-x-2">
             <p class="text-amber-600 cursor-pointer hover:underline" @click="handleUnbind">解除绑定</p>
             <p class="text-amber-600 cursor-pointer hover:underline" @click="handleExport">导出成绩</p>
+            <p class="text-amber-600 cursor-pointer hover:underline" @click="handleTogglePublic">
+              {{ isPublic ? '隐藏成绩' : '公开成绩' }}
+            </p>
           </div>
         </div>
         <div class="flex items-center space-x-4">
@@ -484,5 +537,14 @@ onMounted(() => {
         </div>
       </div>
     </template>
+    <transition name="dialog-fade">
+      <TogglePublicDialog
+        v-if="togglePublicDialogVisible"
+        v-model:visible="togglePublicDialogVisible"
+        :is-public="isPublic"
+        :loading="bindLoading"
+        @confirm="handleConfirmTogglePublic"
+      />
+    </transition>
   </div>
 </template>
