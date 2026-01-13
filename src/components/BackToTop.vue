@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, inject, type Ref } from 'vue'
+import { ref, watchEffect, inject, type Ref } from 'vue'
 import { ChevronUp } from 'lucide-vue-next'
 
 const scrollContainer = inject<Ref<HTMLElement>>('scrollContainer')
@@ -24,19 +24,21 @@ const handleScroll = () => {
   isVisible.value = (scrollContainer?.value?.scrollTop ?? 0) > 0
 }
 
-onMounted(() => {
-  scrollContainer?.value?.addEventListener('scroll', handleScroll)
-})
+let cleanup: (() => void) | null = null
 
-onUnmounted(() => {
-  scrollContainer?.value?.removeEventListener('scroll', handleScroll)
+watchEffect((onCleanup) => {
+  if (scrollContainer?.value) {
+    scrollContainer.value.addEventListener('scroll', handleScroll)
+    
+    cleanup = () => {
+      scrollContainer.value?.removeEventListener('scroll', handleScroll)
+    }
+    
+    onCleanup(cleanup)
+  }
 })
 
 const scrollToTop = () => {
   scrollContainer?.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
-
-<style scoped>
-/* 如果需要额外样式，可以添加 */
-</style>

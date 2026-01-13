@@ -9,6 +9,8 @@ import About from './components/About.vue'
 import BackToTop from './components/BackToTop.vue'
 import axios from 'axios'
 
+const HASURA_API = import.meta.env.VITE_HASURA_API
+
 const route = useRoute()
 
 const scrollContainer = ref()
@@ -37,7 +39,7 @@ provide('scores', scores)
 const isLoaded = ref(false)
 
 onMounted(async () => {
-  const songResponse = await axios.get('https://hasura.llx.life/api/rest/donder/get-song')
+  const songResponse = await axios.get(`${HASURA_API}/api/rest/donder/get-song`)
   songData.value = JSON.parse(songResponse.data.song.data)
 
   localStorage.getItem('userId') && (userId.value = localStorage.getItem('userId') || '')

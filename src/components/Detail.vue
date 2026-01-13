@@ -147,21 +147,21 @@ const jumpToWiki = () => {
           <div class="flex items-end space-x-1 h-10">
             <div
               v-for="(level, index) in data.levels"
-              @click="handleLevelChange(index + 1)"
+              @click="handleLevelChange(Number(index) + 1)"
               class="relative w-15 rounded-t-lg border-2 border-b-none border-amber-950 overflow-hidden transition-all cursor-pointer hover:opacity-100"
               :class="{
-                'bg-red-300': index + 1 === 1,
-                'bg-lime-300': index + 1 === 2,
-                'bg-blue-300': index + 1 === 3,
-                'bg-pink-300': index + 1 === 4,
-                'bg-purple-300': index + 1 === 5,
-                'h-10 opacity-100': selectLevel === index + 1,
-                'h-8 opacity-50': selectLevel !== index + 1,
+                'bg-red-300': Number(index) + 1 === 1,
+                'bg-lime-300': Number(index) + 1 === 2,
+                'bg-blue-300': Number(index) + 1 === 3,
+                'bg-pink-300': Number(index) + 1 === 4,
+                'bg-purple-300': Number(index) + 1 === 5,
+                'h-10 opacity-100': selectLevel === Number(index) + 1,
+                'h-8 opacity-50': selectLevel !== Number(index) + 1,
               }"
             >
               <div class="absolute w-full h-full bg-gradient-to-b from-white/50 to-transparent"></div>
               <div class="relative w-full h-full flex items-center justify-center space-x-1">
-                <img class="w-6" :src="`/img/level/level_${index + 1}.png`" alt="">
+                <img class="w-6" :src="`/img/level/level_${Number(index) + 1}.png`" alt="">
                 <p class="text-white font-bold text-xl text-border">{{ level }}</p>
               </div>
             </div>
@@ -181,7 +181,24 @@ const jumpToWiki = () => {
                     <img class="m-auto w-15" :src="`/img/score_badge/score_${data.score?.best_score_rank}.png`" alt=""></img>
                   </div>
                   <div class="flex">
-                    <img class="m-auto w-15" :src="`/img/crown/crown_${data.score?.full_combo_cnt > 0 ? 'gold' : 'silver'}.png`" alt=""></img>
+                    <img 
+                      v-if="data.score?.dondaful_combo_cnt > 0"
+                      class="m-auto w-15" 
+                      src="/img/crown/crown_rainbow.png" 
+                      alt=""
+                    />
+                    <img 
+                      v-else-if="data.score?.full_combo_cnt > 0"
+                      class="m-auto w-15" 
+                      src="/img/crown/crown_gold.png" 
+                      alt=""
+                    />
+                    <img 
+                      v-else-if="data.score?.clear_cnt > 0"
+                      class="m-auto w-15" 
+                      src="/img/crown/crown_silver.png" 
+                      alt=""
+                    />
                   </div>
                 </div>
               </div>

@@ -6,6 +6,9 @@ import TogglePublicDialog from '../components/TogglePublicDialog.vue'
 import { toast } from 'vue-sonner'
 import axios from 'axios'
 
+const DONDER_API = import.meta.env.VITE_DONDER_API
+const HASURA_API = import.meta.env.VITE_HASURA_API
+
 const types = ['全部', '流行', '动漫', '游戏', '古典', '儿童', '博歌乐', '综合', '南梦宫原创']
 const selectedType = ref('全部')
 
@@ -194,7 +197,7 @@ const filteredScores = computed(() => {
 
 const isPublic = ref(false)
 const getScore = async (id: number) => {
-  const res = await axios.get('https://hasura.llx.life/api/rest/donder/get-score', {
+  const res = await axios.get(`${HASURA_API}/api/rest/donder/get-score`, {
     params: { id }
   })
   const resData = res.data.score
@@ -211,7 +214,7 @@ const getScore = async (id: number) => {
 const bindLoading = ref(false)
 
 const refreshScore = (id: number) => {
-  return axios.post('https://donder.llx.life/refresh_score', { id: Number(id) })
+  return axios.post(`${DONDER_API}/refresh_score`, { id: Number(id) })
 }
 
 const authHintVisible = ref(false)
@@ -222,7 +225,7 @@ const handleBindClick = async () => {
   bindLoading.value = true
 
   try {
-    const res = await axios.post('https://donder.llx.life/auth', { id: Number(id) })
+    const res = await axios.post(`${DONDER_API}/auth`, { id: Number(id) })
 
     if (res.data.success) {
       if (res.data.token) {
@@ -322,7 +325,7 @@ const handleConfirmTogglePublic = async () => {
   if (!userId.value) return
 
   try {
-    const res = await axios.post('https://donder.llx.life/update_public', { isPublic: !isPublic.value })
+    const res = await axios.post(`${DONDER_API}/update_public`, { isPublic: !isPublic.value })
     if (res.data.success) {
       isPublic.value = !isPublic.value
       toast.success(isPublic.value ? '成绩已公开咚~' : '成绩已隐藏咚~')

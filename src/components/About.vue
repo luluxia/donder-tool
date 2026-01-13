@@ -30,6 +30,7 @@ const closeDialog = () => {
         <div class="space-y-1 mb-4 text-gray-700">
           <p>源代码 <a href="https://github.com/luluxia/donder-tool" target="_blank" class="text-blue">luluxia/donder-tool</a></p>
           <p>图片素材 <a href="https://www.spriters-resource.com/arcade/taikonotatsujin2020version/" target="_blank" class="text-blue">spriters-resource.com</a></p>
+          <p>界面参考 <a href="https://dxrating.net/search" target="_blank" class="text-blue">DXRating</a></p>
         </div>
         
         <div class="space-y-4 text-gray-700">
@@ -49,7 +50,7 @@ const closeDialog = () => {
           <div class="flex flex-col">
             <a href="https://qm.qq.com/q/bywwY4MmEo" target="_blank" class="text-blue w-max">太鼓达人入坑群</a>
             <a href="https://tjahelp.eu.org/" target="_blank" class="text-blue w-max">菌菌机器人</a>
-            <a href="https://best.taiko.vanillaaaa.org/" target="_blank" class="text-blue w-max">太鼓之达人 Rating & 六维分析</a>
+            <a href="https://rating.ourtaiko.org/" target="_blank" class="text-blue w-max">太鼓之达人 Rating & 六维分析</a>
             <a href="https://www.donder.click/search-song.html" target="_blank" class="text-blue w-max">歌曲筛选器</a>
             <p>微信小程序 Don Note</p>
           </div>
