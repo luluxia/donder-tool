@@ -11,12 +11,13 @@
 ## 资源致谢
 
 - 图片素材：[spriters-resource.com](https://www.spriters-resource.com/arcade/taikonotatsujin2020version/)
+- 界面参考：[dxrating.net](https://dxrating.net/search)
 
 ## 友情链接
 
 - [太鼓达人入坑群](https://qm.qq.com/q/bywwY4MmEo)
 - [菌菌机器人](https://tjahelp.eu.org/)
-- [太鼓之达人 Rating & 六维分析](https://best.taiko.vanillaaaa.org/)
+- [太鼓之达人 Rating & 六维分析](https://rating.ourtaiko.org/)
 - [歌曲筛选器](https://www.donder.click/search-song.html)
 - 微信小程序 Don Note
 
