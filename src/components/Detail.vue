@@ -270,6 +270,32 @@ const activeTab = ref('成绩详情')
                 <p>还没有该难度的游玩记录咚~</p>
               </div>
             </template>
+            <!-- 排行榜 -->
+            <template v-else-if="activeTab === '排行榜'">
+              <div class="p-2 space-y-2">
+                <select class="w-full p-2 rounded-md bg-sky-400 text-white outline-none">
+                  <option>全部地区</option>
+                  <option>好友排行榜</option>
+                </select>
+                <div class="bg-sky-50 rounded-md overflow-hidden">
+                  <div v-for="i in 50" class="flex items-center space-x-2 p-2 odd-of-type:bg-sky-100">
+                    <div
+                      class="w-8 h-8 bg-sky-200 flex rounded-full"
+                      :class="{
+                        '!bg-amber-400': i === 1,
+                        '!bg-gray-400': i === 2,
+                        '!bg-orange-400': i === 3,
+                      }"
+                    >
+                      <p class="m-auto" :class="i <= 3 && 'text-border text-white'">{{ i }}</p>
+                    </div>
+                    <p class="flex-1">昵称</p>
+                    <p>地区</p>
+                    <p class="text-border text-white text-xl w-23 text-center">1000000</p>
+                  </div>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
         <div>
