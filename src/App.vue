@@ -15,10 +15,10 @@ const route = useRoute()
 
 const scrollContainer = ref()
 
-const aboutVisible = ref(false)
 const detailVisible = ref(false)
 const detailSongId = ref()
 const detailLevel = ref()
+const aboutVisible = ref(false)
 
 provide('detailVisible', detailVisible)
 provide('detailSongId', detailSongId)

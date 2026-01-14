@@ -76,6 +76,9 @@ const jumpToWiki = () => {
   window.open(wikiUrl, '_blank')
 }
 
+const tabs = ref(['成绩详情', '排行榜', '谱面预览'])
+const activeTab = ref('成绩详情')
+
 </script>
 
 <template>
@@ -142,7 +145,7 @@ const jumpToWiki = () => {
             <p class="flex-1 min-w-0">别名1 / 别名2 / 别名3 / 别名1 / 别名2 / 别名3/ 别名1 / 别名2 / 别名3 / 别名1 / 别名2 / 别名3</p>
           </div> -->
         </div>
-        <!-- 谱面预览 -->
+        <!-- 内容 -->
         <div>
           <div class="flex items-end space-x-1 h-10">
             <div
@@ -166,92 +169,107 @@ const jumpToWiki = () => {
               </div>
             </div>
           </div>
-          <div class="w-full min-h-44 flex border-2 border-amber-950 rounded-lg rounded-tl-none overflow-hidden">
-            <div v-if="data.score" class="p-2 w-full grid grid-cols-2 gap-2 md:grid-cols-3">
-              <div class="space-y-1 flex flex-col">
-                <div class="bg-red-400 text-white rounded-lg overflow-hidden text-center flex-1 flex flex-col">
-                  <p class="p-1 bg-red-500 text-sm">历史最高得分</p>
-                  <div class="flex-1 flex flex-col justify-center items-center">
-                    <p class="text-border m-auto text-white font-bold text-3xl tracking-widest">{{ data.score?.high_score }}</p>
-                  </div>
-                </div>
-                <p class="text-xs opacity-50 text-center">{{ data.score?.highscore_datetime.replace(/\//g, '.') }}</p>
-                <div class="grid grid-cols-2">
-                  <div class="flex">
-                    <img class="m-auto w-15" :src="`/img/score_badge/score_${data.score?.best_score_rank}.png`" alt=""></img>
-                  </div>
-                  <div class="flex">
-                    <img 
-                      v-if="data.score?.dondaful_combo_cnt > 0"
-                      class="m-auto w-15" 
-                      src="/img/crown/crown_rainbow.png" 
-                      alt=""
-                    />
-                    <img 
-                      v-else-if="data.score?.full_combo_cnt > 0"
-                      class="m-auto w-15" 
-                      src="/img/crown/crown_gold.png" 
-                      alt=""
-                    />
-                    <img 
-                      v-else-if="data.score?.clear_cnt > 0"
-                      class="m-auto w-15" 
-                      src="/img/crown/crown_silver.png" 
-                      alt=""
-                    />
-                  </div>
-                </div>
-              </div>
-              <div class="space-y-1 text-border text-white">
-                <div class="flex justify-between items-center bg-gradient-to-r from-orange-400 to-gray-300 px-2 py-0.5 rounded-lg">
-                  <p class="text-border text-white">良</p>
-                  <p>{{ data.score?.good_cnt }}</p>
-                </div>
-                <div class="flex justify-between items-center bg-gradient-to-r from-gray-400 to-gray-300 px-2 py-0.5 rounded-lg">
-                  <p class="text-border text-white">可</p>
-                  <p>{{ data.score?.ok_cnt }}</p>
-                </div>
-                <div class="flex justify-between items-center bg-gradient-to-r from-blue-400 to-gray-300 px-2 py-0.5 rounded-lg">
-                  <p class="text-border text-white">不可</p>
-                  <p>{{ data.score?.ng_cnt }}</p>
-                </div>
-                <div class="flex justify-between items-center bg-gradient-to-r from-amber-400 to-gray-300 px-2 py-0.5 rounded-lg">
-                  <p class="text-border text-white">连打数</p>
-                  <p>{{ data.score?.pound_cnt }}</p>
-                </div>
-                <div class="flex justify-between items-center bg-gradient-to-r from-red-400 to-gray-300 px-2 py-0.5 rounded-lg">
-                  <p class="text-border text-white">最大连击数</p>
-                  <p>{{ data.score?.combo_cnt }}</p>
-                </div>
-              </div>
-              <div class="space-y-1 text-border text-white col-span-2 md:col-span-1">
-                <div class="flex justify-center items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                  <p>游玩统计</p>
-                </div>
-                <div class="grid grid-cols-2 gap-1 md:grid-cols-1">
-                  <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                    <p>游玩次数</p>
-                    <p>{{ data.score?.stage_cnt }}</p>
-                  </div>
-                  <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                    <p>通关次数</p>
-                    <p>{{ data.score?.clear_cnt }}</p>
-                  </div>
-                  <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                    <p>全连次数</p>
-                    <p>{{ data.score?.full_combo_cnt }}</p>
-                  </div>
-                  <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                    <p>全良连段次数</p>
-                    <p>{{ data.score?.dondaful_combo_cnt }}</p>
-                  </div>
-                </div>
-              </div>
+          <div class="w-full min-h-60 flex flex-col border-2 border-amber-950 rounded-lg rounded-tl-none overflow-hidden">
+            <!-- 选项 -->
+            <div class="flex p-2 space-x-2 !bg-amber-100 border-b-2 border-amber-950">
+              <p
+                v-for="tab in tabs"
+                @click="activeTab = tab"
+                :key="tab"
+                class="text-amber-950 px-2 py-0.5 rounded cursor-pointer transition-colors hover:bg-amber-400/50"
+                :class="{ 'text-border !bg-amber-400 text-white': activeTab === tab }"
+              >
+                {{ tab }}
+              </p>
             </div>
-            <div v-else class="m-auto flex flex-col items-center space-y-2 opacity-50">
-              <img class="w-35" src="/img/sticker/sticker_2.png" alt="">
-              <p>还没有该难度的游玩记录咚~</p>
-            </div>
+            <!-- 成绩详情 -->
+            <template v-if="activeTab === '成绩详情'">
+              <div v-if="data.score" class="p-2 w-full grid grid-cols-2 gap-2 md:grid-cols-3">
+                <div class="space-y-1 flex flex-col">
+                  <div class="bg-red-400 text-white rounded-lg overflow-hidden text-center flex-1 flex flex-col">
+                    <p class="p-1 bg-red-500 text-sm">历史最高得分</p>
+                    <div class="flex-1 flex flex-col justify-center items-center">
+                      <p class="text-border m-auto text-white font-bold text-3xl tracking-widest">{{ data.score?.high_score }}</p>
+                    </div>
+                  </div>
+                  <p class="text-xs opacity-50 text-center">{{ data.score?.highscore_datetime.replace(/\//g, '.') }}</p>
+                  <div class="grid grid-cols-2">
+                    <div class="flex">
+                      <img class="m-auto w-15" :src="`/img/score_badge/score_${data.score?.best_score_rank}.png`" alt=""></img>
+                    </div>
+                    <div class="flex">
+                      <img 
+                        v-if="data.score?.dondaful_combo_cnt > 0"
+                        class="m-auto w-15" 
+                        src="/img/crown/crown_rainbow.png" 
+                        alt=""
+                      />
+                      <img 
+                        v-else-if="data.score?.full_combo_cnt > 0"
+                        class="m-auto w-15" 
+                        src="/img/crown/crown_gold.png" 
+                        alt=""
+                      />
+                      <img 
+                        v-else-if="data.score?.clear_cnt > 0"
+                        class="m-auto w-15" 
+                        src="/img/crown/crown_silver.png" 
+                        alt=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="space-y-1 text-border text-white">
+                  <div class="flex justify-between items-center bg-gradient-to-r from-orange-400 to-gray-300 px-2 py-0.5 rounded-lg">
+                    <p class="text-border text-white">良</p>
+                    <p>{{ data.score?.good_cnt }}</p>
+                  </div>
+                  <div class="flex justify-between items-center bg-gradient-to-r from-gray-400 to-gray-300 px-2 py-0.5 rounded-lg">
+                    <p class="text-border text-white">可</p>
+                    <p>{{ data.score?.ok_cnt }}</p>
+                  </div>
+                  <div class="flex justify-between items-center bg-gradient-to-r from-blue-400 to-gray-300 px-2 py-0.5 rounded-lg">
+                    <p class="text-border text-white">不可</p>
+                    <p>{{ data.score?.ng_cnt }}</p>
+                  </div>
+                  <div class="flex justify-between items-center bg-gradient-to-r from-amber-400 to-gray-300 px-2 py-0.5 rounded-lg">
+                    <p class="text-border text-white">连打数</p>
+                    <p>{{ data.score?.pound_cnt }}</p>
+                  </div>
+                  <div class="flex justify-between items-center bg-gradient-to-r from-red-400 to-gray-300 px-2 py-0.5 rounded-lg">
+                    <p class="text-border text-white">最大连击数</p>
+                    <p>{{ data.score?.combo_cnt }}</p>
+                  </div>
+                </div>
+                <div class="space-y-1 text-border text-white col-span-2 md:col-span-1">
+                  <div class="flex justify-center items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                    <p>游玩统计</p>
+                  </div>
+                  <div class="grid grid-cols-2 gap-1 md:grid-cols-1">
+                    <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                      <p>游玩次数</p>
+                      <p>{{ data.score?.stage_cnt }}</p>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                      <p>通关次数</p>
+                      <p>{{ data.score?.clear_cnt }}</p>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                      <p>全连次数</p>
+                      <p>{{ data.score?.full_combo_cnt }}</p>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
+                      <p>全良连段次数</p>
+                      <p>{{ data.score?.dondaful_combo_cnt }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="m-auto flex flex-col items-center space-y-2 opacity-50">
+                <img class="w-35" src="/img/sticker/sticker_2.png" alt="">
+                <p>还没有该难度的游玩记录咚~</p>
+              </div>
+            </template>
           </div>
         </div>
         <div>
