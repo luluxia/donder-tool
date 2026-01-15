@@ -1,39 +1,33 @@
 <script setup lang="ts">
-import { onMounted, ref, inject, watchEffect } from 'vue'
+import { onMounted, ref, inject, computed } from 'vue'
 import { X } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+import Score from './detail/Score.vue'
+import Ranking from './detail/Ranking.vue'
 import Button from './Button.vue'
 
-const emit = defineEmits(['update:visible', 'update:select-level'])
-
 const dialogRef = ref<HTMLDialogElement>()
-
-onMounted(() => {
-  dialogRef.value?.show()
-})
-
-const closeDialog = () => {
-  emit('update:visible', false)
-}
-
+const emit = defineEmits(['update:visible', 'update:select-level'])
 const props = defineProps<{
   songId: number
   selectLevel: number
 }>()
 
-const data = ref()
+const closeDialog = () => {
+  emit('update:visible', false)
+}
+const handleLevelChange = (newLevel: number) => {
+  emit('update:select-level', newLevel)
+}
+
+onMounted(() => {
+  dialogRef.value?.show()
+})
 
 const songData = inject('songData') as any
-// const wikiData = inject('wikiData') as any
-const scores = inject('scores') as any
-
-watchEffect(() => {
+const data = computed(() => {
   const cn = songData.value?.find((item: any) => item.id === props.songId)
-  // const wiki = wikiData.value?.find((item: any) => Number(item.songNo) === props.songId)
-
-  const score = scores.value?.find((s: any) => s.song_no === props.songId && s.level === props.selectLevel)
-
-  data.value = {
+  return {
     type: cn?.type || '',
     title: cn?.song_name || '',
     titleJp: cn?.song_name_jp || '',
@@ -47,7 +41,6 @@ watchEffect(() => {
       }
       return '';
     })(),
-    score,
     levels: (() => {
       if (cn?.level_5 === '-') {
         return [cn?.level_1, cn?.level_2, cn?.level_3, cn?.level_4];
@@ -56,14 +49,8 @@ watchEffect(() => {
       }
     })(),
   }
-
 })
 
-const handleLevelChange = (newLevel: number) => {
-  emit('update:select-level', newLevel)
-}
-
-// 复制标题
 const copyTitle = () => {
   if (data.value?.title) {
     navigator.clipboard.writeText(data.value.title)
@@ -78,12 +65,11 @@ const jumpToWiki = () => {
 
 const tabs = ref(['成绩详情', '排行榜', '谱面预览'])
 const activeTab = ref('成绩详情')
-
 </script>
 
 <template>
   <dialog ref="dialogRef" @click="closeDialog" class="fixed w-full h-full top-0 bg-black/50 flex z-1">
-    <div @click.stop class="dialog-content relative bg-white rounded-xl m-auto shadow-xl w-200 max-w-full max-h-[calc(100%-4rem)] flex overflow-hidden">
+    <div @click.stop class="dialog-content relative bg-white rounded-xl m-auto shadow-xl w-200 max-w-full h-[calc(100%-4rem)] flex overflow-hidden">
       <div class="absolute right-4 top-4">
         <button @click="closeDialog" class="p-2 rounded-full transition-colors hover:bg-gray-200">
           <X class="w-6 h-6 text-gray-600" />
@@ -183,119 +169,9 @@ const activeTab = ref('成绩详情')
               </p>
             </div>
             <!-- 成绩详情 -->
-            <template v-if="activeTab === '成绩详情'">
-              <div v-if="data.score" class="p-2 w-full grid grid-cols-2 gap-2 md:grid-cols-3">
-                <div class="space-y-1 flex flex-col">
-                  <div class="bg-red-400 text-white rounded-lg overflow-hidden text-center flex-1 flex flex-col">
-                    <p class="p-1 bg-red-500 text-sm">历史最高得分</p>
-                    <div class="flex-1 flex flex-col justify-center items-center">
-                      <p class="text-border m-auto text-white font-bold text-3xl tracking-widest">{{ data.score?.high_score }}</p>
-                    </div>
-                  </div>
-                  <p class="text-xs opacity-50 text-center">{{ data.score?.highscore_datetime.replace(/\//g, '.') }}</p>
-                  <div class="grid grid-cols-2">
-                    <div class="flex">
-                      <img class="m-auto w-15" :src="`/img/score_badge/score_${data.score?.best_score_rank}.png`" alt=""></img>
-                    </div>
-                    <div class="flex">
-                      <img 
-                        v-if="data.score?.dondaful_combo_cnt > 0"
-                        class="m-auto w-15" 
-                        src="/img/crown/crown_rainbow.png" 
-                        alt=""
-                      />
-                      <img 
-                        v-else-if="data.score?.full_combo_cnt > 0"
-                        class="m-auto w-15" 
-                        src="/img/crown/crown_gold.png" 
-                        alt=""
-                      />
-                      <img 
-                        v-else-if="data.score?.clear_cnt > 0"
-                        class="m-auto w-15" 
-                        src="/img/crown/crown_silver.png" 
-                        alt=""
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div class="space-y-1 text-border text-white">
-                  <div class="flex justify-between items-center bg-gradient-to-r from-orange-400 to-gray-300 px-2 py-0.5 rounded-lg">
-                    <p class="text-border text-white">良</p>
-                    <p>{{ data.score?.good_cnt }}</p>
-                  </div>
-                  <div class="flex justify-between items-center bg-gradient-to-r from-gray-400 to-gray-300 px-2 py-0.5 rounded-lg">
-                    <p class="text-border text-white">可</p>
-                    <p>{{ data.score?.ok_cnt }}</p>
-                  </div>
-                  <div class="flex justify-between items-center bg-gradient-to-r from-blue-400 to-gray-300 px-2 py-0.5 rounded-lg">
-                    <p class="text-border text-white">不可</p>
-                    <p>{{ data.score?.ng_cnt }}</p>
-                  </div>
-                  <div class="flex justify-between items-center bg-gradient-to-r from-amber-400 to-gray-300 px-2 py-0.5 rounded-lg">
-                    <p class="text-border text-white">连打数</p>
-                    <p>{{ data.score?.pound_cnt }}</p>
-                  </div>
-                  <div class="flex justify-between items-center bg-gradient-to-r from-red-400 to-gray-300 px-2 py-0.5 rounded-lg">
-                    <p class="text-border text-white">最大连击数</p>
-                    <p>{{ data.score?.combo_cnt }}</p>
-                  </div>
-                </div>
-                <div class="space-y-1 text-border text-white col-span-2 md:col-span-1">
-                  <div class="flex justify-center items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                    <p>游玩统计</p>
-                  </div>
-                  <div class="grid grid-cols-2 gap-1 md:grid-cols-1">
-                    <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                      <p>游玩次数</p>
-                      <p>{{ data.score?.stage_cnt }}</p>
-                    </div>
-                    <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                      <p>通关次数</p>
-                      <p>{{ data.score?.clear_cnt }}</p>
-                    </div>
-                    <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                      <p>全连次数</p>
-                      <p>{{ data.score?.full_combo_cnt }}</p>
-                    </div>
-                    <div class="flex justify-between items-center bg-gray-200 px-2 py-0.5 rounded-lg">
-                      <p>全良连段次数</p>
-                      <p>{{ data.score?.dondaful_combo_cnt }}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div v-else class="m-auto flex flex-col items-center space-y-2 opacity-50">
-                <img class="w-35" src="/img/sticker/sticker_2.png" alt="">
-                <p>还没有该难度的游玩记录咚~</p>
-              </div>
-            </template>
+            <Score v-if="activeTab === '成绩详情'" :songId="songId" :selectLevel="selectLevel" />
             <!-- 排行榜 -->
-            <template v-else-if="activeTab === '排行榜'">
-              <div class="p-2 space-y-2">
-                <select class="w-full p-2 rounded-md bg-sky-400 text-white outline-none">
-                  <option>全部地区</option>
-                  <option>好友排行榜</option>
-                </select>
-                <div class="bg-sky-50 rounded-md overflow-hidden">
-                  <div v-for="i in 50" class="flex items-center space-x-2 p-2 odd-of-type:bg-sky-100">
-                    <div
-                      class="w-8 h-8 bg-sky-200 flex rounded-full"
-                      :class="{
-                        '!bg-amber-400': i === 1,
-                        '!bg-gray-400': i === 2,
-                        '!bg-orange-400': i === 3,
-                      }"
-                    >
-                      <p class="m-auto" :class="i <= 3 && 'text-border text-white'">{{ i }}</p>
-                    </div>
-                    <p class="flex-1">昵称</p>
-                    <p>地区</p>
-                    <p class="text-border text-white text-xl w-23 text-center">1000000</p>
-                  </div>
-                </div>
-              </div>
-            </template>
+            <Ranking v-if="activeTab === '排行榜'" :songId="songId" :selectLevel="selectLevel" />
           </div>
         </div>
         <div>
