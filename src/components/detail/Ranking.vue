@@ -51,6 +51,7 @@ const loading = ref(false)
 watchEffect(async () => {
   if (!props.songId || !props.selectLevel) return
   loading.value = true
+  data.value = null
   const res = await axios.get(
     `${DONDER_API}/ranking/${props.songId}/${props.selectLevel}/${selectedProvince.value}`
   )

@@ -93,7 +93,7 @@ const score = computed(() => {
       </div>
     </div>
   </div>
-  <div v-else class="m-auto flex flex-col items-center space-y-2 opacity-50">
+  <div v-else class="m-auto flex flex-col items-center space-y-2 opacity-50 py-4">
     <img class="w-35" src="/img/sticker/sticker_2.png" alt="">
     <p>还没有该难度的游玩记录咚~</p>
   </div>

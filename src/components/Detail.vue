@@ -4,6 +4,7 @@ import { X } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import Score from './detail/Score.vue'
 import Ranking from './detail/Ranking.vue'
+import Preview from './detail/Preview.vue'
 import Button from './Button.vue'
 
 const dialogRef = ref<HTMLDialogElement>()
@@ -155,7 +156,7 @@ const activeTab = ref('成绩详情')
               </div>
             </div>
           </div>
-          <div class="w-full min-h-60 flex flex-col border-2 border-amber-950 rounded-lg rounded-tl-none overflow-hidden">
+          <div class="w-full min-h-56 flex flex-col border-2 border-amber-950 rounded-lg rounded-tl-none overflow-hidden">
             <!-- 选项 -->
             <div class="flex p-2 space-x-2 !bg-amber-100 border-b-2 border-amber-950">
               <p
@@ -172,6 +173,8 @@ const activeTab = ref('成绩详情')
             <Score v-if="activeTab === '成绩详情'" :songId="songId" :selectLevel="selectLevel" />
             <!-- 排行榜 -->
             <Ranking v-if="activeTab === '排行榜'" :songId="songId" :selectLevel="selectLevel" />
+            <!-- 预览 -->
+            <Preview v-if="activeTab === '谱面预览'" :songId="songId" :selectLevel="selectLevel" />
           </div>
         </div>
         <div>
