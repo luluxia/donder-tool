@@ -241,7 +241,7 @@ const handleBindClick = async () => {
             fetchedScores = result.scores
             fetchedTime = result.updateTime
           } else {
-            toast.error(res.data.error || '绑定失败，请稍后重试咚~')
+            toast.error(res.data.message || '绑定失败，请稍后重试咚~')
           }
         }
         
@@ -256,10 +256,10 @@ const handleBindClick = async () => {
         return
       }
     } else {
-      toast.error(res.data.error || '绑定失败，请稍后重试咚~')
+      toast.error(res.data.message || '绑定失败，请稍后重试咚~')
     }
   } catch (e: any) {
-    toast.error(e.response?.data?.error || '绑定失败，请稍后重试咚~')
+    toast.error(e.response?.data?.message || '绑定失败，请稍后重试咚~')
   } finally {
     bindLoading.value = false
   }
@@ -279,7 +279,7 @@ const handleSyncClick = async () => {
       toast.success('同步成功咚~')
     }
   } catch (e: any) {
-    toast.error(e.response?.data?.error || '同步失败，请稍后重试咚~')
+    toast.error(e.response?.data?.message || '同步失败，请稍后重试咚~')
   } finally {
     bindLoading.value = false
   }
@@ -330,10 +330,10 @@ const handleConfirmTogglePublic = async () => {
       isPublic.value = !isPublic.value
       toast.success(isPublic.value ? '成绩已公开咚~' : '成绩已隐藏咚~')
     } else {
-      toast.error(res.data.error || '操作失败，请稍后重试咚~')
+      toast.error(res.data.message || '操作失败，请稍后重试咚~')
     }
   } catch (e: any) {
-    toast.error(e.response?.data?.error || '操作失败，请稍后重试咚~')
+    toast.error(e.response?.data?.message || '操作失败，请稍后重试咚~')
   } finally {
     togglePublicDialogVisible.value = false
   }
